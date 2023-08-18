@@ -1,0 +1,1 @@
+az group delete --name test --yes --no-wait
