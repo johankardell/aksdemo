@@ -24,6 +24,8 @@ param dnsPrefix string
 
 param logAnalyticsWorkspaceId string
 
+var k8sVersion = '1.27.3'
+
 resource aks 'Microsoft.ContainerService/managedClusters@2022-05-02-preview' = {
   name: clusterName
   location: location
@@ -32,7 +34,7 @@ resource aks 'Microsoft.ContainerService/managedClusters@2022-05-02-preview' = {
   }
   properties: {
     dnsPrefix: dnsPrefix
-    kubernetesVersion: '1.27.3'
+    kubernetesVersion: k8sVersion
     agentPoolProfiles: [
       {
         name: 'agentpool'
@@ -41,6 +43,10 @@ resource aks 'Microsoft.ContainerService/managedClusters@2022-05-02-preview' = {
         vmSize: agentVMSize
         osType: 'Linux'
         mode: 'System'
+        enableAutoScaling: true
+        orchestratorVersion: k8sVersion
+        minCount: 1
+        maxCount: 10
       }
     ]
     linuxProfile: {
@@ -63,5 +69,106 @@ resource aks 'Microsoft.ContainerService/managedClusters@2022-05-02-preview' = {
     }
   }
 }
+
+// https://samcogan.com/enable-aks-flux-extension-with-infrastructure-as-code/
+
+resource flux 'Microsoft.KubernetesConfiguration/extensions@2023-05-01' = {
+  name: 'flux'
+  scope: aks
+  properties: {
+    extensionType: 'microsoft.flux'
+    scope: {
+      cluster: {
+        releaseNamespace: 'flux-system'
+      }
+    }
+    autoUpgradeMinorVersion: true
+  }
+}
+
+// resource fluxConfig 'Microsoft.KubernetesConfiguration/fluxConfigurations@2023-05-01' = {
+//   name: 'gitops-demo'
+//   scope: aks
+//   dependsOn: [
+//     flux
+//   ]
+//   properties: {
+//     scope: 'cluster'
+//     namespace: 'gitops-demo'
+//     sourceKind: 'GitRepository'
+//     suspend: false
+//     gitRepository: {
+//       url: 'https://github.com/fluxcd/flux2-kustomize-helm-example'
+//       timeoutInSeconds: 600
+//       syncIntervalInSeconds: 600
+//       repositoryRef: {
+//         branch: 'main'
+//       }
+
+//     }
+//     kustomizations: {
+//       infra: {
+//         path: './infrastructure'
+//         dependsOn: []
+//         timeoutInSeconds: 600
+//         syncIntervalInSeconds: 600
+//         prune: true
+//       }
+//       apps: {
+//         path: './apps/staging'
+//         dependsOn: [
+//           'infra'
+//         ]
+//         timeoutInSeconds: 600
+//         syncIntervalInSeconds: 600
+//         retryIntervalInSeconds: 600
+//         prune: true
+//       }
+//     }
+//   }
+// }
+
+
+resource fluxConfig 'Microsoft.KubernetesConfiguration/fluxConfigurations@2023-05-01' = {
+  name: 'flux-demo'
+  scope: aks
+  dependsOn: [
+    flux
+  ]
+  properties: {
+    scope: 'cluster'
+    namespace: 'flux-demo'
+    sourceKind: 'GitRepository'
+    suspend: false
+    gitRepository: {
+      url: 'https://github.com/johankardell/flux-lab'
+      timeoutInSeconds: 600
+      syncIntervalInSeconds: 600
+      repositoryRef: {
+        branch: 'main'
+      }
+
+    }
+    kustomizations: {
+      infra: {
+        path: './infrastructure'
+        dependsOn: []
+        timeoutInSeconds: 600
+        syncIntervalInSeconds: 600
+        prune: true
+      }
+      apps: {
+        path: './apps'
+        dependsOn: [
+          'infra'
+        ]
+        timeoutInSeconds: 600
+        syncIntervalInSeconds: 600
+        prune: true
+      }
+    }
+  }
+}
+
 
 output controlPlaneFQDN string = aks.properties.fqdn

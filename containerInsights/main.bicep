@@ -1,7 +1,7 @@
 targetScope = 'subscription'
 
 var rgName = 'rg-aks-containerinsights-demo'
-var location = 'swedencentral'
+param location string = 'swedencentral'
 var laName = 'la-containerinsights-demo'
 var aksName = 'aks-containerinsights-demo'
 
