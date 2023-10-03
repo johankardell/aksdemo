@@ -26,18 +26,36 @@ param logAnalyticsWorkspaceId string
 
 var k8sVersion = '1.27.3'
 
-resource aks 'Microsoft.ContainerService/managedClusters@2022-05-02-preview' = {
+resource aks 'Microsoft.ContainerService/managedClusters@2023-07-02-preview' = {
   name: clusterName
   location: location
   identity: {
     type: 'SystemAssigned'
   }
+  sku: {
+    name: 'Base'
+    tier: 'Standard'
+  }
   properties: {
     dnsPrefix: dnsPrefix
     kubernetesVersion: k8sVersion
+    nodeResourceGroup: 'rg-${clusterName}-infra'
+    // disableLocalAccounts: true // breaks Flux
+    networkProfile: {
+      networkPlugin: 'azure'
+      networkPluginMode: 'overlay'
+      podCidr: '192.168.0.0/16'
+    }
+    aadProfile: {
+      managed: true
+      enableAzureRBAC: true
+      adminGroupObjectIDs: [
+        'a9afb2ca-1ae6-46b2-b117-446156c81741' // aksadmins
+      ]
+    }
     agentPoolProfiles: [
       {
-        name: 'agentpool'
+        name: 'system'
         osDiskSizeGB: osDiskSizeGB
         count: agentCount
         vmSize: agentVMSize
@@ -46,7 +64,25 @@ resource aks 'Microsoft.ContainerService/managedClusters@2022-05-02-preview' = {
         enableAutoScaling: true
         orchestratorVersion: k8sVersion
         minCount: 1
-        maxCount: 10
+        maxCount: 100
+        // availabilityZones: [
+        //   '1'
+        //   '2'
+        //   '3'
+        // ]
+        // osDiskType: 'Ephemeral' //not supported by selected vm type
+      }
+      {
+        name: 'apps'
+        osDiskSizeGB: osDiskSizeGB
+        count: agentCount
+        vmSize: agentVMSize
+        osType: 'Linux'
+        mode: 'User'
+        enableAutoScaling: true
+        orchestratorVersion: k8sVersion
+        minCount: 1
+        maxCount: 100
       }
     ]
     linuxProfile: {

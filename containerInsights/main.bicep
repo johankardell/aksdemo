@@ -14,7 +14,7 @@ resource rg 'Microsoft.Resources/resourceGroups@2023-07-01' = {
 
 module la 'logAnalytics.bicep' = {
   name: laName
-  scope: resourceGroup(rgName)
+  scope: rg
   params: {
     laName: laName
     location: location
@@ -22,7 +22,7 @@ module la 'logAnalytics.bicep' = {
 }
 
 module aks 'aks.bicep' = {
-  scope: resourceGroup(rgName)
+  scope: rg
   name: aksName
   params: {
     location: location
