@@ -1,9 +1,9 @@
 targetScope = 'subscription'
 
-var rgName = 'rg-aks-containerinsights-demo'
+var rgName = 'rg-aks-gitopsSimple-demo'
 param location string = 'swedencentral'
-var laName = 'la-containerinsights-demo'
-var aksName = 'aks-containerinsights-demo'
+var laName = 'la-gitopsSimple-demo'
+var aksName = 'aks-gitopsSimple-demo'
 
 param sshkey string
 
