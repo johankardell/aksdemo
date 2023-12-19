@@ -24,9 +24,11 @@ param dnsPrefix string
 
 param logAnalyticsWorkspaceId string
 
-var k8sVersion = '1.27.3'
+param subnetid string
 
-resource aks 'Microsoft.ContainerService/managedClusters@2023-07-02-preview' = {
+var k8sVersion = '1.28.3'
+
+resource aks 'Microsoft.ContainerService/managedClusters@2023-10-02-preview' = {
   name: clusterName
   location: location
   identity: {
@@ -44,7 +46,6 @@ resource aks 'Microsoft.ContainerService/managedClusters@2023-07-02-preview' = {
     networkProfile: {
       networkPlugin: 'azure'
       networkPluginMode: 'overlay'
-      podCidr: '192.168.0.0/16'
     }
     aadProfile: {
       managed: true
@@ -64,25 +65,49 @@ resource aks 'Microsoft.ContainerService/managedClusters@2023-07-02-preview' = {
         enableAutoScaling: true
         orchestratorVersion: k8sVersion
         minCount: 1
-        maxCount: 100
-        // availabilityZones: [
-        //   '1'
-        //   '2'
-        //   '3'
-        // ]
+        maxCount: 3
+        vnetSubnetID: subnetid
+        availabilityZones: [
+          '1'
+          '2'
+          '3'
+        ]
         // osDiskType: 'Ephemeral' //not supported by selected vm type
       }
       {
         name: 'apps'
         osDiskSizeGB: osDiskSizeGB
-        count: agentCount
+        count: 1
         vmSize: agentVMSize
         osType: 'Linux'
+        // osSKU: 'AzureLinux'
         mode: 'User'
         enableAutoScaling: true
         orchestratorVersion: k8sVersion
         minCount: 1
-        maxCount: 100
+        maxCount: 5
+        maxPods: 100
+        vnetSubnetID: subnetid
+        availabilityZones: [
+          '1'
+          '2'
+          '3'
+        ]
+      }
+      {
+        name: 'win'
+        osDiskSizeGB: osDiskSizeGB
+        count: 1
+        vmSize: agentVMSize
+        osType: 'Windows'
+        osSKU: 'Windows2022'
+        mode: 'User'
+        enableAutoScaling: true
+        orchestratorVersion: k8sVersion
+        minCount: 1
+        maxCount: 5
+        maxPods: 50
+        vnetSubnetID: subnetid
       }
     ]
     linuxProfile: {
@@ -121,48 +146,6 @@ resource flux 'Microsoft.KubernetesConfiguration/extensions@2023-05-01' = {
     autoUpgradeMinorVersion: true
   }
 }
-
-// resource fluxConfig 'Microsoft.KubernetesConfiguration/fluxConfigurations@2023-05-01' = {
-//   name: 'gitops-demo'
-//   scope: aks
-//   dependsOn: [
-//     flux
-//   ]
-//   properties: {
-//     scope: 'cluster'
-//     namespace: 'gitops-demo'
-//     sourceKind: 'GitRepository'
-//     suspend: false
-//     gitRepository: {
-//       url: 'https://github.com/fluxcd/flux2-kustomize-helm-example'
-//       timeoutInSeconds: 600
-//       syncIntervalInSeconds: 600
-//       repositoryRef: {
-//         branch: 'main'
-//       }
-
-//     }
-//     kustomizations: {
-//       infra: {
-//         path: './infrastructure'
-//         dependsOn: []
-//         timeoutInSeconds: 600
-//         syncIntervalInSeconds: 600
-//         prune: true
-//       }
-//       apps: {
-//         path: './apps/staging'
-//         dependsOn: [
-//           'infra'
-//         ]
-//         timeoutInSeconds: 600
-//         syncIntervalInSeconds: 600
-//         retryIntervalInSeconds: 600
-//         prune: true
-//       }
-//     }
-//   }
-// }
 
 
 resource fluxConfig 'Microsoft.KubernetesConfiguration/fluxConfigurations@2023-05-01' = {
@@ -205,6 +188,5 @@ resource fluxConfig 'Microsoft.KubernetesConfiguration/fluxConfigurations@2023-0
     }
   }
 }
-
 
 output controlPlaneFQDN string = aks.properties.fqdn
