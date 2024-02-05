@@ -23,7 +23,8 @@ param dnsPrefix string
 
 param logAnalyticsWorkspaceId string
 
-var k8sVersion = '1.27.3'
+var k8sVersion = '1.28.3'
+var nodeVersion = '1.28.3'
 
 resource aks 'Microsoft.ContainerService/managedClusters@2023-07-02-preview' = {
   name: clusterName
@@ -61,7 +62,7 @@ resource aks 'Microsoft.ContainerService/managedClusters@2023-07-02-preview' = {
         osType: 'Linux'
         mode: 'System'
         enableAutoScaling: true
-        orchestratorVersion: k8sVersion
+        orchestratorVersion: nodeVersion
         minCount: 1
         maxCount: 100
       }
@@ -73,7 +74,7 @@ resource aks 'Microsoft.ContainerService/managedClusters@2023-07-02-preview' = {
         osType: 'Linux'
         mode: 'User'
         enableAutoScaling: true
-        orchestratorVersion: k8sVersion
+        orchestratorVersion: nodeVersion
         minCount: 0
         maxCount: 100
       }

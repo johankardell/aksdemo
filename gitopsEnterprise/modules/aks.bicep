@@ -27,6 +27,7 @@ param logAnalyticsWorkspaceId string
 param subnetid string
 
 var k8sVersion = '1.28.3'
+var nodeVersion = '1.28.3'
 
 resource aks 'Microsoft.ContainerService/managedClusters@2023-10-02-preview' = {
   name: clusterName
@@ -63,7 +64,7 @@ resource aks 'Microsoft.ContainerService/managedClusters@2023-10-02-preview' = {
         osType: 'Linux'
         mode: 'System'
         enableAutoScaling: true
-        orchestratorVersion: k8sVersion
+        orchestratorVersion: nodeVersion
         minCount: 1
         maxCount: 3
         vnetSubnetID: subnetid
@@ -83,7 +84,7 @@ resource aks 'Microsoft.ContainerService/managedClusters@2023-10-02-preview' = {
         // osSKU: 'AzureLinux'
         mode: 'User'
         enableAutoScaling: true
-        orchestratorVersion: k8sVersion
+        orchestratorVersion: nodeVersion
         minCount: 1
         maxCount: 5
         maxPods: 100
@@ -103,7 +104,7 @@ resource aks 'Microsoft.ContainerService/managedClusters@2023-10-02-preview' = {
         osSKU: 'Windows2022'
         mode: 'User'
         enableAutoScaling: true
-        orchestratorVersion: k8sVersion
+        orchestratorVersion: nodeVersion
         minCount: 1
         maxCount: 5
         maxPods: 50
