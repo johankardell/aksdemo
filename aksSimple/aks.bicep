@@ -23,14 +23,24 @@ param dnsPrefix string
 
 param logAnalyticsWorkspaceId string
 
+param aksidname string
+
 var k8sVersion = '1.28.3'
 var nodeVersion = '1.28.3'
+
+resource aksid 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
+  name: aksidname
+  location: location
+}
 
 resource aks 'Microsoft.ContainerService/managedClusters@2023-07-02-preview' = {
   name: clusterName
   location: location
   identity: {
-    type: 'SystemAssigned'
+    type: 'UserAssigned'
+    userAssignedIdentities: {
+      '${aksid.id}': {}
+    }
   }
   sku: {
     name: 'Base'
@@ -88,6 +98,21 @@ resource aks 'Microsoft.ContainerService/managedClusters@2023-07-02-preview' = {
         ]
       }
     }
+    autoUpgradeProfile: {
+      upgradeChannel: 'patch'
+      nodeOSUpgradeChannel: 'NodeImage'
+    }
+    storageProfile: {
+      diskCSIDriver: {
+        enabled: true
+      }
+      fileCSIDriver: {
+        enabled: true
+      }
+      snapshotController: {
+        enabled: true
+      }
+    }
     addonProfiles: {
       omsagent: {
         enabled: true
@@ -98,3 +123,5 @@ resource aks 'Microsoft.ContainerService/managedClusters@2023-07-02-preview' = {
     }
   }
 }
+
+output akskubeletid string = aks.properties.identityProfile.kubeletidentity.objectId

@@ -4,6 +4,8 @@ var rgName = 'rg-aks-simple-demo'
 param location string = 'swedencentral'
 var laName = 'la-simple-demo'
 var aksName = 'aks-simple-demo'
+var acrName = 'jkacrsimpledemo'
+var aksidname = 'id-aks'
 
 param sshkey string
 
@@ -31,5 +33,19 @@ module aks 'aks.bicep' = {
     linuxAdminUsername: 'aksuser'
     sshRSAPublicKey: sshkey
     logAnalyticsWorkspaceId: la.outputs.id
+    aksidname: aksidname
   }
+}
+
+module acr 'acr.bicep' = {
+  scope: rg
+  name: acrName
+  params: {
+    acrName: acrName
+    location: location
+    aksid: aks.outputs.akskubeletid
+  }
+  dependsOn: [
+    aks
+  ]
 }
