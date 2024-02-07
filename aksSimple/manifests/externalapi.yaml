@@ -32,6 +32,8 @@ spec:
           limits:
             memory: "128Mi"
             cpu: "500m"
+      nodeSelector:
+        agentpool: "apps"
 ---
 apiVersion: v1
 kind: Service
