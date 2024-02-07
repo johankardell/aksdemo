@@ -55,6 +55,7 @@ resource aks 'Microsoft.ContainerService/managedClusters@2023-07-02-preview' = {
       networkPluginMode: 'dynamic'
       podCidr: '192.168.0.0/16'
     }
+    disableLocalAccounts: true
     aadProfile: {
       managed: true
       enableAzureRBAC: true
@@ -73,7 +74,7 @@ resource aks 'Microsoft.ContainerService/managedClusters@2023-07-02-preview' = {
         enableAutoScaling: true
         orchestratorVersion: nodeVersion
         minCount: 1
-        maxCount: 100
+        maxCount: 5
       }
       {
         name: 'apps'
@@ -85,7 +86,7 @@ resource aks 'Microsoft.ContainerService/managedClusters@2023-07-02-preview' = {
         enableAutoScaling: true
         orchestratorVersion: nodeVersion
         minCount: 0
-        maxCount: 100
+        maxCount: 10
       }
     ]
     linuxProfile: {
