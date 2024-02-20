@@ -8,6 +8,7 @@ var acrName = 'jkacrsimpledemo'
 var aksidname = 'id-aks'
 
 param sshkey string
+param managementIP string
 
 resource rg 'Microsoft.Resources/resourceGroups@2023-07-01' = {
   name: rgName
@@ -34,6 +35,7 @@ module aks 'aks.bicep' = {
     sshRSAPublicKey: sshkey
     logAnalyticsWorkspaceId: la.outputs.id
     aksidname: aksidname
+    managementIP: managementIP
   }
 }
 

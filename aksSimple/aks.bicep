@@ -6,13 +6,11 @@ param location string = resourceGroup().location
 @maxValue(1023)
 param osDiskSizeGB int = 0
 
-@description('The number of nodes for the cluster.')
-@minValue(1)
-@maxValue(50)
 param agentCount int = 3
 
-@description('The size of the Virtual Machine.')
-param agentVMSize string = 'Standard_D4as_v5'
+param sysVMSize string = 'Standard_B2ms'
+
+param appsVMSize string = 'Standard_D4as_v5'
 
 @description('User name for the Linux Virtual Machines.')
 param linuxAdminUsername string
@@ -24,6 +22,7 @@ param dnsPrefix string
 param logAnalyticsWorkspaceId string
 
 param aksidname string
+param managementIP string
 
 var k8sVersion = '1.28.3'
 var nodeVersion = '1.28.3'
@@ -56,6 +55,11 @@ resource aks 'Microsoft.ContainerService/managedClusters@2023-07-02-preview' = {
       podCidr: '192.168.0.0/16'
     }
     disableLocalAccounts: true
+    apiServerAccessProfile: {
+      authorizedIPRanges: [
+        managementIP
+      ]
+    }
     aadProfile: {
       managed: true
       enableAzureRBAC: true
@@ -68,8 +72,9 @@ resource aks 'Microsoft.ContainerService/managedClusters@2023-07-02-preview' = {
         name: 'system'
         osDiskSizeGB: osDiskSizeGB
         count: agentCount
-        vmSize: agentVMSize
+        vmSize: sysVMSize
         osType: 'Linux'
+        osSKU: 'AzureLinux'
         mode: 'System'
         enableAutoScaling: true
         orchestratorVersion: nodeVersion
@@ -80,8 +85,9 @@ resource aks 'Microsoft.ContainerService/managedClusters@2023-07-02-preview' = {
         name: 'apps'
         osDiskSizeGB: osDiskSizeGB
         count: agentCount
-        vmSize: agentVMSize
+        vmSize: appsVMSize
         osType: 'Linux'
+        osSKU: 'AzureLinux'
         mode: 'User'
         enableAutoScaling: true
         orchestratorVersion: nodeVersion

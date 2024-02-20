@@ -1,29 +1,29 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: externalapi
+  name: weatherapi
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: externalapi
-  name: externalapi
-  namespace: externalapi
+    app: weatherapi
+  name: weatherapi
+  namespace: weatherapi
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: externalapi
+      app: weatherapi
   strategy: {}
   template:
     metadata:
       labels:
-        app: externalapi
+        app: weatherapi
     spec:
       containers:
-      - image: jkacrsimpledemo.azurecr.io/sampleapp:0.1
-        name: externalapi
+      - image: jkacrsimpledemo.azurecr.io/sampleapp:0.2
+        name: weatherapi
         imagePullPolicy: Always
         resources:
           requests:
@@ -39,16 +39,16 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: externalapi
-  name: externalapi-svc
-  namespace: externalapi
+    app: weatherapi
+  name: weatherapi-svc
+  namespace: weatherapi
 spec:
   type: LoadBalancer
   ports:
   - port: 80
     protocol: TCP
-    targetPort: 80
+    targetPort: 8080
   selector:
-    app: externalapi
+    app: weatherapi
   sessionAffinity: None
 
