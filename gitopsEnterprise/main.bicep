@@ -8,6 +8,8 @@ var aksName = 'aks-gitopsEnterprise-demo'
 var vnetLzName = 'vnet-lz-gitopsEnterprise-demo'
 var vnetHubName = 'vnet-hub-gitopsEnterprise-demo'
 var bastionName = 'bastion-gitopsEnterprise-demo'
+var miname = 'id-gitopsEnterprise-demo'
+var azfwname = 'azfw-gitopsEnterprise-demo'
 
 param sshkey string
 
@@ -43,15 +45,15 @@ module vnetlz 'modules/vnet-lz.bicep' = {
   }
 }
 
-module bastion 'modules/bastion.bicep' = {
-  name: bastionName
-  scope: rg
-  params: {
-    location: location
-    name: bastionName
-    subnetid: vnethub.outputs.bastionsubnetid
-  }
-}
+// module bastion 'modules/bastion.bicep' = {
+//   name: bastionName
+//   scope: rg
+//   params: {
+//     location: location
+//     name: bastionName
+//     subnetid: vnethub.outputs.bastionsubnetid
+//   }
+// }
 
 module vnetpeering 'modules/vnet-peering.bicep' = {
   scope: rg
@@ -66,6 +68,16 @@ module vnetpeering 'modules/vnet-peering.bicep' = {
   }
 }
 
+module mi 'modules/identity.bicep' = {
+  scope: rg
+  name: miname
+  params: {
+    miname: miname
+    location: location
+  }
+}
+
+
 module aks 'modules/aks.bicep' = {
   scope: rg
   name: aksName
@@ -77,5 +89,16 @@ module aks 'modules/aks.bicep' = {
     sshRSAPublicKey: sshkey
     logAnalyticsWorkspaceId: la.outputs.id
     subnetid: vnetlz.outputs.subnetid
+  }
+}
+
+module azfw 'modules/azurefirewall.bicep' = {
+  scope: rg
+  name: azfwname
+  params: {
+    firewallName: azfwname 
+    firewallSubnetId: vnethub.outputs.firewallsubnetid
+    firewallManagementSubnetId: vnethub.outputs.firewallmanagementsubnetid
+    location:location
   }
 }

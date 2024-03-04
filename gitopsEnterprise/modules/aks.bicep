@@ -95,21 +95,21 @@ resource aks 'Microsoft.ContainerService/managedClusters@2023-10-02-preview' = {
           '3'
         ]
       }
-      {
-        name: 'win'
-        osDiskSizeGB: osDiskSizeGB
-        count: 1
-        vmSize: agentVMSize
-        osType: 'Windows'
-        osSKU: 'Windows2022'
-        mode: 'User'
-        enableAutoScaling: true
-        orchestratorVersion: nodeVersion
-        minCount: 1
-        maxCount: 5
-        maxPods: 50
-        vnetSubnetID: subnetid
-      }
+      // {
+      //   name: 'win'
+      //   osDiskSizeGB: osDiskSizeGB
+      //   count: 1
+      //   vmSize: agentVMSize
+      //   osType: 'Windows'
+      //   osSKU: 'Windows2022'
+      //   mode: 'User'
+      //   enableAutoScaling: true
+      //   orchestratorVersion: nodeVersion
+      //   minCount: 1
+      //   maxCount: 5
+      //   maxPods: 50
+      //   vnetSubnetID: subnetid
+      // }
     ]
     linuxProfile: {
       adminUsername: linuxAdminUsername
@@ -119,6 +119,21 @@ resource aks 'Microsoft.ContainerService/managedClusters@2023-10-02-preview' = {
             keyData: sshRSAPublicKey
           }
         ]
+      }
+    }
+    autoUpgradeProfile: {
+      upgradeChannel: 'patch'
+      nodeOSUpgradeChannel: 'NodeImage'
+    }
+    storageProfile: {
+      diskCSIDriver: {
+      enabled: true
+      }
+      fileCSIDriver: {
+        enabled: true
+      }
+      snapshotController: {
+        enabled: true
       }
     }
     addonProfiles: {

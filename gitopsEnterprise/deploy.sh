@@ -1,8 +1,7 @@
 sshKey=`cat ~/.ssh/id_rsa.pub`
 
-## Classic deployment
-# az deployment sub create --location swedencentral --template-file main.bicep -n gitopsEnterprise --parameters sshkey="$sshKey"
-
-
 ## Deployment stack
 az stack sub create --deny-settings-mode none --delete-all --location swedencentral --template-file main.bicep -n gitopsEnterprise --parameters sshkey="$sshKey" --yes
+
+# az aks get-credentials -g rg-aks-gitopsEnterprise-demo -n aks-gitopsEnterprise-demo --format azure
+# kubelogin convert-kubeconfig -l azurecli

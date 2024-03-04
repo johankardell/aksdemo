@@ -18,13 +18,21 @@ resource vnet 'Microsoft.Network/virtualNetworks@2023-06-01' = {
         }
       }
       {
-        name: 'AzureBastionSubnet'
+        name: 'AzureFirewallManagementSubnet'
         properties: {
           addressPrefix: '10.0.1.0/24'
+        }
+      }
+      {
+        name: 'AzureBastionSubnet'
+        properties: {
+          addressPrefix: '10.0.2.0/24'
         }
       }
     ]
   }
 }
 
-output bastionsubnetid string = vnet.properties.subnets[1].id
+output firewallsubnetid string = vnet.properties.subnets[0].id
+output firewallmanagementsubnetid string = vnet.properties.subnets[1].id
+output bastionsubnetid string = vnet.properties.subnets[2].id
