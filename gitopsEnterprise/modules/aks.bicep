@@ -11,8 +11,8 @@ param osDiskSizeGB int = 0
 @maxValue(50)
 param agentCount int = 3
 
-@description('The size of the Virtual Machine.')
-param agentVMSize string = 'Standard_D4as_v5'
+param sysVMSize string = 'Standard_B2ms'
+param appsVMSize string = 'Standard_B4ms'
 
 @description('User name for the Linux Virtual Machines.')
 param linuxAdminUsername string
@@ -24,16 +24,27 @@ param dnsPrefix string
 
 param logAnalyticsWorkspaceId string
 
+param aksidname string
+param managementIP string
+
 param subnetid string
 
 var k8sVersion = '1.28.3'
 var nodeVersion = '1.28.3'
 
+resource aksid 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
+  name: aksidname
+  location: location
+}
+
 resource aks 'Microsoft.ContainerService/managedClusters@2023-10-02-preview' = {
   name: clusterName
   location: location
   identity: {
-    type: 'SystemAssigned'
+    type: 'UserAssigned'
+    userAssignedIdentities: {
+      '${aksid.id}': {}
+    }
   }
   sku: {
     name: 'Base'
@@ -44,6 +55,11 @@ resource aks 'Microsoft.ContainerService/managedClusters@2023-10-02-preview' = {
     kubernetesVersion: k8sVersion
     nodeResourceGroup: 'rg-${clusterName}-infra'
     // disableLocalAccounts: true // breaks Flux
+    apiServerAccessProfile: {
+      authorizedIPRanges: [
+        managementIP
+      ]
+    }
     networkProfile: {
       networkPlugin: 'azure'
       networkPluginMode: 'overlay'
@@ -60,40 +76,41 @@ resource aks 'Microsoft.ContainerService/managedClusters@2023-10-02-preview' = {
         name: 'system'
         osDiskSizeGB: osDiskSizeGB
         count: agentCount
-        vmSize: agentVMSize
+        vmSize: sysVMSize
         osType: 'Linux'
+        osSKU: 'AzureLinux'
         mode: 'System'
         enableAutoScaling: true
         orchestratorVersion: nodeVersion
         minCount: 1
         maxCount: 3
         vnetSubnetID: subnetid
-        availabilityZones: [
-          '1'
-          '2'
-          '3'
-        ]
+        // availabilityZones: [
+        //   '1'
+        //   '2'
+        //   '3'
+        // ]
         // osDiskType: 'Ephemeral' //not supported by selected vm type
       }
       {
         name: 'apps'
         osDiskSizeGB: osDiskSizeGB
         count: 1
-        vmSize: agentVMSize
+        vmSize: appsVMSize
         osType: 'Linux'
-        // osSKU: 'AzureLinux'
+        osSKU: 'AzureLinux'
         mode: 'User'
         enableAutoScaling: true
         orchestratorVersion: nodeVersion
-        minCount: 1
+        minCount: 0
         maxCount: 5
-        maxPods: 100
+        maxPods: 30
         vnetSubnetID: subnetid
-        availabilityZones: [
-          '1'
-          '2'
-          '3'
-        ]
+        // availabilityZones: [
+        //   '1'
+        //   '2'
+        //   '3'
+        // ]
       }
       // {
       //   name: 'win'

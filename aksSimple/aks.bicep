@@ -9,8 +9,7 @@ param osDiskSizeGB int = 0
 param agentCount int = 3
 
 param sysVMSize string = 'Standard_B2ms'
-
-param appsVMSize string = 'Standard_D4as_v5'
+param appsVMSize string = 'Standard_B4ms'
 
 @description('User name for the Linux Virtual Machines.')
 param linuxAdminUsername string

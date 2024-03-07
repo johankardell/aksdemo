@@ -18,9 +18,9 @@ resource vnet 'Microsoft.Network/virtualNetworks@2023-06-01' = {
           networkSecurityGroup: {
             id: nsgaks.id
           }
-          routeTable: {
-            id: routetable.id
-          }
+          // routeTable: {
+          //   id: routetable.id
+          // }
         }
       }
       {

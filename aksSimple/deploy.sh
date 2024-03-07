@@ -5,5 +5,3 @@ IP="$(curl ipinfo.io/ip 2>/dev/null)"
 
 az deployment sub create --location swedencentral --template-file main.bicep -n aksSimple --parameters sshkey="$sshKey" managementIP=$IP
 
-az aks get-credentials -g rg-aks-simple-demo -n aks-simple-demo --format azure --overwrite-existing
-kubelogin convert-kubeconfig -l azurecli

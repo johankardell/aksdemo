@@ -11,6 +11,8 @@ var bastionName = 'bastion-gitopsEnterprise-demo'
 var miname = 'id-gitopsEnterprise-demo'
 var azfwname = 'azfw-gitopsEnterprise-demo'
 
+param managementIP string
+
 param sshkey string
 
 resource rg 'Microsoft.Resources/resourceGroups@2023-07-01' = {
@@ -68,16 +70,6 @@ module vnetpeering 'modules/vnet-peering.bicep' = {
   }
 }
 
-module mi 'modules/identity.bicep' = {
-  scope: rg
-  name: miname
-  params: {
-    miname: miname
-    location: location
-  }
-}
-
-
 module aks 'modules/aks.bicep' = {
   scope: rg
   name: aksName
@@ -89,6 +81,8 @@ module aks 'modules/aks.bicep' = {
     sshRSAPublicKey: sshkey
     logAnalyticsWorkspaceId: la.outputs.id
     subnetid: vnetlz.outputs.subnetid
+    aksidname: miname
+    managementIP: managementIP
   }
 }
 
