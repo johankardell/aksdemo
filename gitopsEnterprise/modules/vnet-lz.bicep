@@ -18,9 +18,9 @@ resource vnet 'Microsoft.Network/virtualNetworks@2023-06-01' = {
           networkSecurityGroup: {
             id: nsgaks.id
           }
-          // routeTable: {
-          //   id: routetable.id
-          // }
+          routeTable: {
+            id: routetableAKS.id
+          }
         }
       }
       {
@@ -31,7 +31,7 @@ resource vnet 'Microsoft.Network/virtualNetworks@2023-06-01' = {
             id: nsgiaas.id
           }
           routeTable: {
-            id: routetable.id
+            id: routetableIaaS.id
           }
         }
       }
@@ -83,13 +83,30 @@ resource nsgiaas 'Microsoft.Network/networkSecurityGroups@2023-06-01' = {
   }
 }
 
-resource routetable 'Microsoft.Network/routeTables@2023-09-01' = {
+resource routetableAKS 'Microsoft.Network/routeTables@2023-09-01' = {
   name: 'rt-aks'
   location: location
   properties: {
     routes: [
       {
-        name: 'route-aks'
+        name: 'default'
+        properties: {
+          addressPrefix: '0.0.0.0/0'
+          nextHopType: 'VirtualAppliance'
+          nextHopIpAddress: '10.0.0.4'
+        }
+      }
+    ]
+  }
+}
+
+resource routetableIaaS 'Microsoft.Network/routeTables@2023-09-01' = {
+  name: 'rt-iaas'
+  location: location
+  properties: {
+    routes: [
+      {
+        name: 'default'
         properties: {
           addressPrefix: '0.0.0.0/0'
           nextHopType: 'VirtualAppliance'

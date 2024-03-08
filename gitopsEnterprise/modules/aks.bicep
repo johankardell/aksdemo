@@ -29,7 +29,7 @@ param managementIP string
 
 param subnetid string
 
-var k8sVersion = '1.28.3'
+var k8sVersion = '1.28.5'
 var nodeVersion = '1.28.3'
 
 resource aksid 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
@@ -55,14 +55,16 @@ resource aks 'Microsoft.ContainerService/managedClusters@2023-10-02-preview' = {
     kubernetesVersion: k8sVersion
     nodeResourceGroup: 'rg-${clusterName}-infra'
     // disableLocalAccounts: true // breaks Flux
-    apiServerAccessProfile: {
-      authorizedIPRanges: [
-        managementIP
-      ]
-    }
+    // should be enabled, but I change IP too often
+    // apiServerAccessProfile: {
+    //   authorizedIPRanges: [
+    //     managementIP
+    //   ]
+    // }
     networkProfile: {
       networkPlugin: 'azure'
       networkPluginMode: 'overlay'
+      outboundType: 'loadBalancer'
     }
     aadProfile: {
       managed: true
@@ -84,6 +86,7 @@ resource aks 'Microsoft.ContainerService/managedClusters@2023-10-02-preview' = {
         orchestratorVersion: nodeVersion
         minCount: 1
         maxCount: 3
+        maxPods: 50
         vnetSubnetID: subnetid
         // availabilityZones: [
         //   '1'
@@ -104,7 +107,7 @@ resource aks 'Microsoft.ContainerService/managedClusters@2023-10-02-preview' = {
         orchestratorVersion: nodeVersion
         minCount: 0
         maxCount: 5
-        maxPods: 30
+        maxPods: 50
         vnetSubnetID: subnetid
         // availabilityZones: [
         //   '1'
@@ -166,60 +169,62 @@ resource aks 'Microsoft.ContainerService/managedClusters@2023-10-02-preview' = {
 
 // https://samcogan.com/enable-aks-flux-extension-with-infrastructure-as-code/
 
-resource flux 'Microsoft.KubernetesConfiguration/extensions@2023-05-01' = {
-  name: 'flux'
-  scope: aks
-  properties: {
-    extensionType: 'microsoft.flux'
-    scope: {
-      cluster: {
-        releaseNamespace: 'flux-system'
-      }
-    }
-    autoUpgradeMinorVersion: true
-  }
-}
+// temporarily disable flux to make deployments faster
+//
+// resource flux 'Microsoft.KubernetesConfiguration/extensions@2023-05-01' = {
+//   name: 'flux'
+//   scope: aks
+//   properties: {
+//     extensionType: 'microsoft.flux'
+//     scope: {
+//       cluster: {
+//         releaseNamespace: 'flux-system'
+//       }
+//     }
+//     autoUpgradeMinorVersion: true
+//   }
+// }
 
 
-resource fluxConfig 'Microsoft.KubernetesConfiguration/fluxConfigurations@2023-05-01' = {
-  name: 'flux-demo'
-  scope: aks
-  dependsOn: [
-    flux
-  ]
-  properties: {
-    scope: 'cluster'
-    namespace: 'flux-demo'
-    sourceKind: 'GitRepository'
-    suspend: false
-    gitRepository: {
-      url: 'https://github.com/johankardell/flux-lab'
-      timeoutInSeconds: 600
-      syncIntervalInSeconds: 600
-      repositoryRef: {
-        branch: 'main'
-      }
+// resource fluxConfig 'Microsoft.KubernetesConfiguration/fluxConfigurations@2023-05-01' = {
+//   name: 'flux-demo'
+//   scope: aks
+//   dependsOn: [
+//     flux
+//   ]
+//   properties: {
+//     scope: 'cluster'
+//     namespace: 'flux-demo'
+//     sourceKind: 'GitRepository'
+//     suspend: false
+//     gitRepository: {
+//       url: 'https://github.com/johankardell/flux-lab'
+//       timeoutInSeconds: 600
+//       syncIntervalInSeconds: 600
+//       repositoryRef: {
+//         branch: 'main'
+//       }
 
-    }
-    kustomizations: {
-      infra: {
-        path: './infrastructure'
-        dependsOn: []
-        timeoutInSeconds: 600
-        syncIntervalInSeconds: 600
-        prune: true
-      }
-      apps: {
-        path: './apps'
-        dependsOn: [
-          'infra'
-        ]
-        timeoutInSeconds: 600
-        syncIntervalInSeconds: 600
-        prune: true
-      }
-    }
-  }
-}
+//     }
+//     kustomizations: {
+//       infra: {
+//         path: './infrastructure'
+//         dependsOn: []
+//         timeoutInSeconds: 600
+//         syncIntervalInSeconds: 600
+//         prune: true
+//       }
+//       apps: {
+//         path: './apps'
+//         dependsOn: [
+//           'infra'
+//         ]
+//         timeoutInSeconds: 600
+//         syncIntervalInSeconds: 600
+//         prune: true
+//       }
+//     }
+//   }
+// }
 
 output controlPlaneFQDN string = aks.properties.fqdn

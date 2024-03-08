@@ -47,15 +47,15 @@ module vnetlz 'modules/vnet-lz.bicep' = {
   }
 }
 
-// module bastion 'modules/bastion.bicep' = {
-//   name: bastionName
-//   scope: rg
-//   params: {
-//     location: location
-//     name: bastionName
-//     subnetid: vnethub.outputs.bastionsubnetid
-//   }
-// }
+module bastion 'modules/bastion.bicep' = {
+  name: bastionName
+  scope: rg
+  params: {
+    location: location
+    name: bastionName
+    subnetid: vnethub.outputs.bastionsubnetid
+  }
+}
 
 module vnetpeering 'modules/vnet-peering.bicep' = {
   scope: rg
@@ -94,5 +94,6 @@ module azfw 'modules/azurefirewall.bicep' = {
     firewallSubnetId: vnethub.outputs.firewallsubnetid
     firewallManagementSubnetId: vnethub.outputs.firewallmanagementsubnetid
     location:location
+    workspaceid: la.outputs.id
   }
 }
