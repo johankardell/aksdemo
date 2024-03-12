@@ -13,24 +13,18 @@ param agentCount int = 3
 
 param sysVMSize string = 'Standard_B2ms'
 param appsVMSize string = 'Standard_B4ms'
-
-@description('User name for the Linux Virtual Machines.')
 param linuxAdminUsername string
-
-@description('Configure all linux machines with the SSH RSA public key string. Your key should include three parts, for example \'ssh-rsa AAAAB...snip...UcyupgH azureuser@linuxvm\'')
 param sshRSAPublicKey string
-
 param dnsPrefix string
-
 param logAnalyticsWorkspaceId string
-
 param aksidname string
-param managementIP string
-
+param adminIp string
 param subnetid string
 
 var k8sVersion = '1.28.5'
-var nodeVersion = '1.28.3'
+var nodeVersion = '1.28.5'
+
+var contributorRoleDefId= 'b24988ac-6180-42a0-ab88-20f7382dd24c'
 
 resource aksid 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: aksidname
@@ -58,13 +52,15 @@ resource aks 'Microsoft.ContainerService/managedClusters@2023-10-02-preview' = {
     // should be enabled, but I change IP too often
     // apiServerAccessProfile: {
     //   authorizedIPRanges: [
-    //     managementIP
+    //     adminIp
     //   ]
     // }
     networkProfile: {
       networkPlugin: 'azure'
       networkPluginMode: 'overlay'
-      outboundType: 'loadBalancer'
+      outboundType: 'userDefinedRouting' // ingress egress via AZFW
+      // outboundType: 'managedNATGateway' // doesn't seem to work. deployment fails. need to investigate.
+      // outboundType: 'loadBalancer' // ingress via LB, egress via AZFW 
     }
     aadProfile: {
       managed: true
@@ -166,6 +162,15 @@ resource aks 'Microsoft.ContainerService/managedClusters@2023-10-02-preview' = {
     }
   }
 }
+
+resource rgRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+  name: guid(aksid.id, contributorRoleDefId, aks.name)
+  properties: {
+    principalId: aksid.properties.principalId
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', contributorRoleDefId)
+  }
+}
+
 
 // https://samcogan.com/enable-aks-flux-extension-with-infrastructure-as-code/
 

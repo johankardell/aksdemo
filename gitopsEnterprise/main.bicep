@@ -10,8 +10,10 @@ var vnetHubName = 'vnet-hub-gitopsEnterprise-demo'
 var bastionName = 'bastion-gitopsEnterprise-demo'
 var miname = 'id-gitopsEnterprise-demo'
 var azfwname = 'azfw-gitopsEnterprise-demo'
+var appgwname = 'appgw-gitopsEnterprise-demo'
+var vmname = 'vm-ubuntu'
 
-param managementIP string
+param adminIp string
 
 param sshkey string
 
@@ -57,6 +59,18 @@ module bastion 'modules/bastion.bicep' = {
   }
 }
 
+module vm 'modules/vm.bicep' = {
+  name: vmname
+  scope: rg
+  params: {
+    location: location
+    name: vmname
+    subnetId: vnetlz.outputs.iaassubnetid
+    publicKey: sshkey
+    adminUsername: 'azureuser'
+  }
+}
+
 module vnetpeering 'modules/vnet-peering.bicep' = {
   scope: rg
   dependsOn: [
@@ -80,9 +94,9 @@ module aks 'modules/aks.bicep' = {
     linuxAdminUsername: 'aksuser'
     sshRSAPublicKey: sshkey
     logAnalyticsWorkspaceId: la.outputs.id
-    subnetid: vnetlz.outputs.subnetid
+    subnetid: vnetlz.outputs.akssubnetid
     aksidname: miname
-    managementIP: managementIP
+    adminIp: adminIp
   }
 }
 
@@ -95,5 +109,16 @@ module azfw 'modules/azurefirewall.bicep' = {
     firewallManagementSubnetId: vnethub.outputs.firewallmanagementsubnetid
     location:location
     workspaceid: la.outputs.id
+  }
+}
+
+module appgw 'modules/appgw.bicep' = {
+  scope: rg
+  name: appgwname
+  params: {
+    appurl: '10.1.15.250'
+    location: location
+    name: appgwname
+    subnetId: vnetlz.outputs.appgwsubnetid
   }
 }

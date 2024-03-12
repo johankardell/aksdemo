@@ -35,6 +35,18 @@ resource vnet 'Microsoft.Network/virtualNetworks@2023-06-01' = {
           }
         }
       }
+      {
+        name: 'appgw'
+        properties: {
+          addressPrefix: '10.1.17.0/24'
+          networkSecurityGroup: {
+            id: nsgappgw.id
+          }
+          routeTable: {
+            id: routetableAppgw.id
+          }
+        }
+      }
     ]
   }
 }
@@ -42,11 +54,11 @@ resource vnet 'Microsoft.Network/virtualNetworks@2023-06-01' = {
 resource nsgaks 'Microsoft.Network/networkSecurityGroups@2023-06-01' = {
   name: 'nsg-aks'
   location: location
-  properties:{
-    securityRules:[
+  properties: {
+    securityRules: [
       {
         name: 'allow-http'
-        properties:{
+        properties: {
           access: 'Allow'
           direction: 'Inbound'
           priority: 500
@@ -64,11 +76,11 @@ resource nsgaks 'Microsoft.Network/networkSecurityGroups@2023-06-01' = {
 resource nsgiaas 'Microsoft.Network/networkSecurityGroups@2023-06-01' = {
   name: 'nsg-iaas'
   location: location
-  properties:{
-    securityRules:[
+  properties: {
+    securityRules: [
       {
         name: 'allow-ssh'
-        properties:{
+        properties: {
           access: 'Allow'
           direction: 'Inbound'
           priority: 500
@@ -76,6 +88,41 @@ resource nsgiaas 'Microsoft.Network/networkSecurityGroups@2023-06-01' = {
           sourcePortRange: '*'
           sourceAddressPrefix: '*'
           destinationPortRange: '22'
+          destinationAddressPrefix: '*'
+        }
+      }
+    ]
+  }
+}
+
+resource nsgappgw 'Microsoft.Network/networkSecurityGroups@2023-06-01' = {
+  name: 'nsg-appgw'
+  location: location
+  properties: {
+    securityRules: [
+      {
+        name: 'allow-http'
+        properties: {
+          access: 'Allow'
+          direction: 'Inbound'
+          priority: 500
+          protocol: 'Tcp'
+          sourcePortRange: '*'
+          sourceAddressPrefix: '*'
+          destinationPortRange: '80'
+          destinationAddressPrefix: '*'
+        }
+      }
+      {
+        name: 'allow-appgw-required'
+        properties: {
+          access: 'Allow'
+          direction: 'Inbound'
+          priority: 600
+          protocol: 'Tcp'
+          sourcePortRange: '*'
+          sourceAddressPrefix: '*'
+          destinationPortRange: '65200-65535'
           destinationAddressPrefix: '*'
         }
       }
@@ -117,4 +164,14 @@ resource routetableIaaS 'Microsoft.Network/routeTables@2023-09-01' = {
   }
 }
 
-output subnetid string = vnet.properties.subnets[0].id
+resource routetableAppgw 'Microsoft.Network/routeTables@2023-09-01' = {
+  name: 'rt-appgw'
+  location: location
+  properties: {
+    routes: []
+  }
+}
+
+output akssubnetid string = vnet.properties.subnets[0].id
+output iaassubnetid string = vnet.properties.subnets[1].id
+output appgwsubnetid string = vnet.properties.subnets[2].id
