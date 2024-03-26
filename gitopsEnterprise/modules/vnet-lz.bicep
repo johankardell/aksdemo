@@ -175,3 +175,4 @@ resource routetableAppgw 'Microsoft.Network/routeTables@2023-09-01' = {
 output akssubnetid string = vnet.properties.subnets[0].id
 output iaassubnetid string = vnet.properties.subnets[1].id
 output appgwsubnetid string = vnet.properties.subnets[2].id
+output vnetid string = vnet.id

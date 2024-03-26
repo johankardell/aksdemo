@@ -14,8 +14,8 @@ resource vm 'Microsoft.Compute/virtualMachines@2021-04-01' = {
     storageProfile: {
       imageReference: {
         publisher: 'canonical'
-        offer: '0001-com-ubuntu-server-jammy'
-        sku: '22_04-lts'
+        offer: '0001-com-ubuntu-server-mantic'
+        sku: '23_10'
         version: 'latest'
       }
       osDisk: {

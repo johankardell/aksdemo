@@ -12,7 +12,7 @@ var miname = 'id-gitopsEnterprise-demo'
 var azfwname = 'azfw-gitopsEnterprise-demo'
 var appgwname = 'appgw-gitopsEnterprise-demo'
 var vmname = 'vm-ubuntu'
-
+var privatednszonename = 'akszone.private.swedencentral.azmk8s.io'
 param adminIp string
 
 param sshkey string
@@ -84,6 +84,29 @@ module vnetpeering 'modules/vnet-peering.bicep' = {
   }
 }
 
+module aksmi 'modules/aksmi.bicep' = {
+  scope: rg
+  name: miname
+  params: {
+    aksidname: miname
+    location: location
+  }
+}
+
+module privatednszone 'modules/privatednszone.bicep' = {
+  scope: rg
+  name: 'privatednszone'
+  params: {
+    aksidname: miname
+    vnetId: vnetlz.outputs.vnetid
+    privateDnsZoneName: privatednszonename
+    vnetname: vnetLzName
+  }
+  dependsOn: [
+    aksmi
+  ]
+}
+
 module aks 'modules/aks.bicep' = {
   scope: rg
   name: aksName
@@ -97,7 +120,11 @@ module aks 'modules/aks.bicep' = {
     subnetid: vnetlz.outputs.akssubnetid
     aksidname: miname
     adminIp: adminIp
+    privateDnsZoneId: privatednszone.outputs.privateDNSZoneId
   }
+  dependsOn: [
+    aksmi
+  ]
 }
 
 module azfw 'modules/azurefirewall.bicep' = {

@@ -18,17 +18,16 @@ param sshRSAPublicKey string
 param dnsPrefix string
 param logAnalyticsWorkspaceId string
 param aksidname string
-param adminIp string
 param subnetid string
+param privateDnsZoneId string
 
-var k8sVersion = '1.28.5'
-var nodeVersion = '1.28.5'
+var k8sVersion = '1.29.0'
+var nodeVersion = '1.29.0'
 
-var contributorRoleDefId= 'b24988ac-6180-42a0-ab88-20f7382dd24c'
+var aksadmingroup = 'a9afb2ca-1ae6-46b2-b117-446156c81741'
 
-resource aksid 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
+resource aksid 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
   name: aksidname
-  location: location
 }
 
 resource aks 'Microsoft.ContainerService/managedClusters@2023-10-02-preview' = {
@@ -49,12 +48,6 @@ resource aks 'Microsoft.ContainerService/managedClusters@2023-10-02-preview' = {
     kubernetesVersion: k8sVersion
     nodeResourceGroup: 'rg-${clusterName}-infra'
     // disableLocalAccounts: true // breaks Flux
-    // should be enabled, but I change IP too often
-    // apiServerAccessProfile: {
-    //   authorizedIPRanges: [
-    //     adminIp
-    //   ]
-    // }
     networkProfile: {
       networkPlugin: 'azure'
       networkPluginMode: 'overlay'
@@ -62,12 +55,26 @@ resource aks 'Microsoft.ContainerService/managedClusters@2023-10-02-preview' = {
       // outboundType: 'managedNATGateway' // doesn't seem to work. deployment fails. need to investigate.
       // outboundType: 'loadBalancer' // ingress via LB, egress via AZFW 
     }
+    apiServerAccessProfile: {
+      enablePrivateCluster: true
+      privateDNSZone: privateDnsZoneId
+      enablePrivateClusterPublicFQDN: false
+      //disableRunCommand:true
+    }
     aadProfile: {
       managed: true
       enableAzureRBAC: true
+      tenantID: subscription().tenantId
       adminGroupObjectIDs: [
-        'a9afb2ca-1ae6-46b2-b117-446156c81741' // aksadmins
+        aksadmingroup
       ]
+    }
+    identityProfile: {
+      kubeletidentity: {
+        resourceId: aksid.id
+        clientId: aksid.properties.clientId
+        objectId: aksid.properties.principalId
+      }
     }
     agentPoolProfiles: [
       {
@@ -163,14 +170,6 @@ resource aks 'Microsoft.ContainerService/managedClusters@2023-10-02-preview' = {
   }
 }
 
-resource rgRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-  name: guid(aksid.id, contributorRoleDefId, aks.name)
-  properties: {
-    principalId: aksid.properties.principalId
-    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', contributorRoleDefId)
-  }
-}
-
 
 // https://samcogan.com/enable-aks-flux-extension-with-infrastructure-as-code/
 
@@ -232,4 +231,4 @@ resource rgRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-pr
 //   }
 // }
 
-output controlPlaneFQDN string = aks.properties.fqdn
+// output controlPlaneFQDN string = aks.properties.fqdn
