@@ -25,6 +25,7 @@ tools
 [Bb]in/
 [Oo]bj/
 [Pp]ackages/
+.mono/
 
 # Apple directory
 .DS_Store
