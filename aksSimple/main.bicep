@@ -9,6 +9,7 @@ var aksidname = 'id-aks'
 
 param sshkey string
 param managementIP string
+param deployACR bool
 
 resource rg 'Microsoft.Resources/resourceGroups@2023-07-01' = {
   name: rgName
@@ -39,7 +40,7 @@ module aks 'aks.bicep' = {
   }
 }
 
-module acr 'acr.bicep' = {
+module acr 'acr.bicep' = if (deployACR) {
   scope: rg
   name: acrName
   params: {
