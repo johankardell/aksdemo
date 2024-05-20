@@ -22,7 +22,7 @@ spec:
         app: weatherapi
     spec:
       containers:
-      - image: jkacrsimpledemo.azurecr.io/sampleapp:0.3
+      - image: jkacrsimpledemo.azurecr.io/sampleapp:0.4
         name: weatherapi
         imagePullPolicy: Always
         resources:
