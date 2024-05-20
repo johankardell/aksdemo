@@ -1,8 +1,8 @@
-FROM mcr.microsoft.com/dotnet/aspnet:8.0.2 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:8.0.5-cbl-mariner2.0 AS base
 WORKDIR /app
 EXPOSE 8080
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0.200 AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0.300 AS build
 WORKDIR /src
 COPY ["sampleApp.csproj", "."]
 RUN dotnet restore "./sampleApp.csproj"
@@ -14,7 +14,7 @@ FROM build AS publish
 RUN dotnet publish "sampleApp.csproj" -c Release -o /app/publish
 
 FROM base AS final
-RUN apt-get update && apt-get upgrade -y && apt-get autoremove -y
+RUN yum upgrade -y && yum autoremove -y
 WORKDIR /app
 ENV APP_VERSION=$DOCKER_TAG
 COPY --from=publish /app/publish .
