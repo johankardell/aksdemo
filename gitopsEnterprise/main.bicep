@@ -13,7 +13,6 @@ var azfwname = 'azfw-gitopsEnterprise-demo'
 var appgwname = 'appgw-gitopsEnterprise-demo'
 var vmname = 'vm-ubuntu'
 var privatednszonename = 'akszone.private.swedencentral.azmk8s.io'
-param adminIp string
 
 param sshkey string
 
@@ -119,7 +118,6 @@ module aks 'modules/aks.bicep' = {
     logAnalyticsWorkspaceId: la.outputs.id
     subnetid: vnetlz.outputs.akssubnetid
     aksidname: miname
-    adminIp: adminIp
     privateDnsZoneId: privatednszone.outputs.privateDNSZoneId
   }
   dependsOn: [

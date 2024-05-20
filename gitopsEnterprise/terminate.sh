@@ -1,1 +1,1 @@
-az stack sub delete --delete-all -n gitopsEnterprise --yes
+az stack sub delete --action-on-unmanage deleteAll -n gitopsEnterprise --yes
