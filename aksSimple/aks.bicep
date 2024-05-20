@@ -23,8 +23,8 @@ param logAnalyticsWorkspaceId string
 param aksidname string
 param managementIP string
 
-var k8sVersion = '1.28.5'
-var nodeVersion = '1.28.5'
+var k8sVersion = '1.29.4'
+var nodeVersion = '1.29.4'
 
 resource aksid 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: aksidname
@@ -54,11 +54,11 @@ resource aks 'Microsoft.ContainerService/managedClusters@2023-07-02-preview' = {
       podCidr: '192.168.0.0/16'
     }
     disableLocalAccounts: true
-    apiServerAccessProfile: {
-      authorizedIPRanges: [
-        managementIP
-      ]
-    }
+    // apiServerAccessProfile: {
+    //   authorizedIPRanges: [
+    //     managementIP
+    //   ]
+    // }
     aadProfile: {
       managed: true
       enableAzureRBAC: true
