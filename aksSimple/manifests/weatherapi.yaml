@@ -22,7 +22,7 @@ spec:
         app: weatherapi
     spec:
       containers:
-      - image: jkacrsimpledemo.azurecr.io/sampleapp:0.4
+      - image: jkacrsimpledemo.azurecr.io/sampleapp:0.5
         name: weatherapi
         imagePullPolicy: Always
         resources:
@@ -32,6 +32,8 @@ spec:
           limits:
             memory: "128Mi"
             cpu: "500m"
+        securityContext:
+          runAsUser: 1000
       nodeSelector:
         agentpool: "apps"
 ---

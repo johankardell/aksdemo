@@ -1,1 +1,1 @@
-az acr build --registry jkacrsimpledemo --image sampleapp:0.4 . -f Dockerfile
+az acr build --registry jkacrsimpledemo --image sampleapp:0.5 . -f Dockerfile

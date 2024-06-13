@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/aspnet:8.0.5-cbl-mariner2.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:8.0.6-cbl-mariner2.0 AS base
 WORKDIR /app
 EXPOSE 8080
 
@@ -15,7 +15,12 @@ RUN dotnet publish "sampleApp.csproj" -c Release -o /app/publish
 
 FROM base AS final
 RUN yum upgrade -y && yum autoremove -y
+
+RUN yum install shadow-utils -y
+RUN useradd -u 1000 -ms /bin/bash aspnet
+USER aspnet
 WORKDIR /app
+
 ENV APP_VERSION=$DOCKER_TAG
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "sampleApp.dll"]
