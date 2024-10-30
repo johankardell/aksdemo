@@ -24,7 +24,7 @@ param privateDnsZoneId string
 var k8sVersion = '1.29.0'
 var nodeVersion = '1.29.0'
 
-var aksadmingroup = 'a9afb2ca-1ae6-46b2-b117-446156c81741'
+var aksadmingroup = '1edf6441-ba72-4c12-af38-a71b56a37116'
 
 resource aksid 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
   name: aksidname
