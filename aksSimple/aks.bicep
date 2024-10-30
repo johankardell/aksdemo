@@ -63,7 +63,7 @@ resource aks 'Microsoft.ContainerService/managedClusters@2023-07-02-preview' = {
       managed: true
       enableAzureRBAC: true
       adminGroupObjectIDs: [
-        'a9afb2ca-1ae6-46b2-b117-446156c81741' // aksadmins
+        '1edf6441-ba72-4c12-af38-a71b56a37116' // aksadmins
       ]
     }
     agentPoolProfiles: [
