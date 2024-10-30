@@ -33,3 +33,6 @@ tools
 # Terraform
 .terraform
 terraform.tfstate
+
+# Loki
+values.yaml
