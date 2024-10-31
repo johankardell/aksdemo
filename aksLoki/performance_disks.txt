@@ -1,0 +1,37 @@
+#Devbox
+  READ: bw=24.8MiB/s (26.0MB/s), 3112KiB/s-3308KiB/s (3187kB/s-3388kB/s), io=1493MiB (1565MB), run=60107-60108msec
+  WRITE: bw=24.8MiB/s (26.0MB/s), 3100KiB/s-3329KiB/s (3174kB/s-3408kB/s), io=1490MiB (1563MB), run=60107-60108msec
+
+#Laptop
+  READ: bw=129MiB/s (136MB/s), 16.0MiB/s-16.3MiB/s (16.7MB/s-17.1MB/s), io=7761MiB (8138MB), run=60001-60001msec
+  WRITE: bw=129MiB/s (136MB/s), 16.0MiB/s-16.3MiB/s (16.8MB/s-17.1MB/s), io=7768MiB (8146MB), run=60001-60001msec
+
+#D4s_v3, mounted using container storage
+  READ: bw=15.9MiB/s (16.7MB/s), 2011KiB/s-2060KiB/s (2059kB/s-2110kB/s), io=956MiB (1002MB), run=60025-60039msec
+  WRITE: bw=15.9MiB/s (16.7MB/s), 2004KiB/s-2076KiB/s (2052kB/s-2126kB/s), io=957MiB (1004MB), run=60025-60039msec
+
+#L8as_v3 - temp disk, mounted using container storage
+  READ: bw=8144KiB/s (8339kB/s), 998KiB/s-1048KiB/s (1022kB/s-1073kB/s), io=477MiB (501MB), run=60030-60030msec
+  WRITE: bw=8142KiB/s (8338kB/s), 981KiB/s-1038KiB/s (1005kB/s-1063kB/s), io=477MiB (501MB), run=60030-60030msec
+
+#L8as_v3 - NVME, mounted using container storage --- detta test måste vara fel - det kan inte vara NVME
+  READ: bw=121MiB/s (127MB/s), 15.0MiB/s-15.2MiB/s (15.8MB/s-15.9MB/s), io=7254MiB (7606MB), run=60001-60001msec
+  WRITE: bw=121MiB/s (127MB/s), 15.1MiB/s-15.2MiB/s (15.8MB/s-15.9MB/s), io=7261MiB (7614MB), run=60001-60001msec
+
+# Standard_D16ads_v5 (local temp, mounted using container storage)
+  READ: bw=116MiB/s (122MB/s), 14.2MiB/s-14.6MiB/s (14.9MB/s-15.4MB/s), io=6955MiB (7292MB), run=60001-60001msec
+  WRITE: bw=116MiB/s (122MB/s), 14.3MiB/s-14.7MiB/s (15.0MB/s-15.4MB/s), io=6962MiB (7300MB), run=60001-60001msec
+
+# Standard_B4ms (local temp, mounted using emptydir, not container storage)
+
+# Standard_L8 (local temp, mounted using hostpath to /mnt)
+  READ: bw=8166KiB/s (8362kB/s), 1008KiB/s-1031KiB/s (1032kB/s-1056kB/s), io=479MiB (502MB), run=60026-60027msec
+  WRITE: bw=8167KiB/s (8363kB/s), 1005KiB/s-1035KiB/s (1030kB/s-1059kB/s), io=479MiB (502MB), run=60026-60027msec
+
+# Standard_D16ads_v5 (local ???, mounted using hostpath to /mnt)
+  READ: bw=149MiB/s (157MB/s), 17.8MiB/s-19.7MiB/s (18.7MB/s-20.7MB/s), io=8961MiB (9396MB), run=60001-60001msec
+  WRITE: bw=150MiB/s (157MB/s), 17.8MiB/s-19.8MiB/s (18.7MB/s-20.7MB/s), io=8971MiB (9407MB), run=60001-60001msec
+
+#L8as_v3 (local NVME, mounted using hostpath after fdisk+formatting the nvme on host)
+  READ: bw=782MiB/s (820MB/s), 97.3MiB/s-98.2MiB/s (102MB/s-103MB/s), io=45.8GiB (49.2GB), run=60001-60001msec
+  WRITE: bw=782MiB/s (820MB/s), 97.5MiB/s-98.1MiB/s (102MB/s-103MB/s), io=45.8GiB (49.2GB), run=60001-60001msec
