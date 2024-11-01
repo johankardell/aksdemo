@@ -23,8 +23,8 @@ param logAnalyticsWorkspaceId string
 param aksidname string
 param managementIP string
 
-var k8sVersion = '1.29.4'
-var nodeVersion = '1.29.4'
+var k8sVersion = '1.31.1'
+var nodeVersion = '1.31.1'
 
 resource aksid 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: aksidname
