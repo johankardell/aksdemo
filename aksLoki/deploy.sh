@@ -26,13 +26,19 @@ az aks nodepool add \
     --node-osdisk-size 30 \
     --ssh-access disabled \
     --max-pods 250 \
-    --labels loki="true"
+    --labels loki="true" \
+    --no-wait
 
-MI_ID=$(az aks show --resource-group $RESOURCE_GROUP_NAME --name $CLUSTER_NAME --query identityProfile.kubeletidentity.clientId -o tsv)
+KUBELET_CLIENT_ID=$(az aks show --resource-group $RESOURCE_GROUP_NAME --name $CLUSTER_NAME --query identityProfile.kubeletidentity.clientId -o tsv)
+KUBELET_OBJECT_ID=$(az aks show --resource-group $RESOURCE_GROUP_NAME --name $CLUSTER_NAME --query identityProfile.kubeletidentity.objectId -o tsv)
+
+# Update in argocd-demo repo with correct KUBELET_CLIENT_ID
+echo $KUBELET_CLIENT_ID
+
 az role assignment create \
-    --assignee $MI_ID \
+    --assignee-object-id "$KUBELET_OBJECT_ID" \
     --role "Storage Blob Data Contributor" \
-    --scope $(az storage account show --name $SA_NAME --resource-group $SA_RG --subscription $SA_SUB --query id --output tsv)
+    --scope "$(az storage account show --name "$SA_NAME" --resource-group "$SA_RG" --subscription "$SA_SUB" --query id --output tsv)"
 
 az aks get-credentials -g "${RESOURCE_GROUP_NAME}" -n ${CLUSTER_NAME} --format azure --overwrite-existing
 kubelogin convert-kubeconfig -l azurecli
@@ -42,6 +48,7 @@ kubectl create namespace argocd
 kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 
 pwd=$(k get secret -n argocd argocd-initial-admin-secret -o json | jq .data.password -r | base64 -d)
+echo $pwd 
 
 k port-forward svc/argocd-server -n argocd 8080:443
 argocd login localhost:8080 --username admin --password $pwd
@@ -93,5 +100,3 @@ k get secret -n grafana grafana -o json | jq '.data.["admin-password"]' -r | bas
 k port-forward svc/grafana -n grafana 3000:80
 # Add Loki as source in Grafana: http://loki-gateway.loki.svc
 
-# Run sample app that generates logs
-k run logger --image chentex/random-logger:latest
