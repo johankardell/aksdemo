@@ -1,6 +1,10 @@
+# az extension add --name aks-preview
+
 CLUSTER_NAME="aks-loki"
 RESOURCE_GROUP_NAME="rg-aks-loki"
+SYS_NODEPOOL_NAME="system"
 APPS_POOL_NAME="apps"
+LOKI_POOL_NAME="loki"
 SA_NAME="jklokidemo"
 SA_RG="rg-aks-loki"
 SA_SUB=$(az account show --name four --query id -o tsv)
@@ -15,18 +19,43 @@ az aks create \
     --kubernetes-version 1.31.1 \
     --ssh-access disabled \
     --enable-image-cleaner \
+    --system-node-pool-name $SYS_NODEPOOL_NAME \
     --node-vm-size Standard_B4ms
+
+az aks nodepool update \
+        --cluster-name $CLUSTER_NAME \
+        --resource-group $RESOURCE_GROUP_NAME \
+        --name $SYS_NODEPOOL_NAME \
+        --node-taints CriticalAddonsOnly=true:NoSchedule
 
 az aks nodepool add \
     --cluster-name $CLUSTER_NAME \
     --resource-group $RESOURCE_GROUP_NAME \
     --name $APPS_POOL_NAME \
+    --node-count 1 \
+    --node-vm-size Standard_D4s_v5 \
+    --node-osdisk-size 30 \
+    --ssh-access disabled \
+    --max-pods 250 \
+    --no-wait
+
+az aks nodepool update \
+    --cluster-name $CLUSTER_NAME \
+    --resource-group $RESOURCE_GROUP_NAME \
+    --name $APPS_POOL_NAME \
+    --labels nginx="true"
+
+az aks nodepool add \
+    --cluster-name $CLUSTER_NAME \
+    --resource-group $RESOURCE_GROUP_NAME \
+    --name $LOKI_POOL_NAME \
     --node-count 3 \
     --node-vm-size Standard_D4s_v5 \
     --node-osdisk-size 30 \
     --ssh-access disabled \
     --max-pods 250 \
     --labels loki="true" \
+    --zones 1 2 3 \
     --no-wait
 
 KUBELET_CLIENT_ID=$(az aks show --resource-group $RESOURCE_GROUP_NAME --name $CLUSTER_NAME --query identityProfile.kubeletidentity.clientId -o tsv)
@@ -57,7 +86,7 @@ argocd login localhost:8080 --username admin --password $pwd
 argocd app create nginx \
     --repo https://github.com/johankardell/argocd-demo \
     --path ./nginx/ \
-    --dest-namespace nginx-demo \
+    --dest-namespace nginx \
     --dest-server https://kubernetes.default.svc \
     --sync-policy automated \
     --sync-option CreateNamespace=true
