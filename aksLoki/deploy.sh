@@ -19,7 +19,7 @@ az aks create \
     --kubernetes-version 1.31.1 \
     --ssh-access disabled \
     --enable-image-cleaner \
-    --system-node-pool-name $SYS_NODEPOOL_NAME \
+    --nodepool-name $SYS_NODEPOOL_NAME \
     --node-vm-size Standard_B4ms
 
 az aks nodepool update \
