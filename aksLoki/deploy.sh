@@ -59,18 +59,18 @@ az aks nodepool add \
     --os-sku AzureLinux \
     --no-wait
 
-az aks nodepool add \
-    --cluster-name $CLUSTER_NAME \
-    --resource-group $RESOURCE_GROUP_NAME \
-    --name $WINDOWS_POOL_NAME \
-    --node-count 1 \
-    --node-vm-size standard_d4ads_v5 \
-    --node-osdisk-size 250 \
-    --os-type Windows \
-    --os-sku Windows2022 \
-    --max-pods 250 \
-    --node-taints windows=true:NoSchedule \
-    --no-wait
+# az aks nodepool add \
+#     --cluster-name $CLUSTER_NAME \
+#     --resource-group $RESOURCE_GROUP_NAME \
+#     --name $WINDOWS_POOL_NAME \
+#     --node-count 1 \
+#     --node-vm-size standard_d4ads_v5 \
+#     --node-osdisk-size 250 \
+#     --os-type Windows \
+#     --os-sku Windows2022 \
+#     --max-pods 250 \
+#     --node-taints windows=true:NoSchedule \
+#     --no-wait
 
 KUBELET_CLIENT_ID=$(az aks show --resource-group $RESOURCE_GROUP_NAME --name $CLUSTER_NAME --query identityProfile.kubeletidentity.clientId -o tsv)
 KUBELET_OBJECT_ID=$(az aks show --resource-group $RESOURCE_GROUP_NAME --name $CLUSTER_NAME --query identityProfile.kubeletidentity.objectId -o tsv)
@@ -148,13 +148,13 @@ argocd app create logger \
     --sync-option CreateNamespace=true
 
 # Has nothing to do with Loki
-argocd app create aspnet \
-    --repo https://github.com/johankardell/argocd-demo \
-    --path ./aspnet/ \
-    --dest-namespace aspnet \
-    --dest-server https://kubernetes.default.svc \
-    --sync-policy automated \
-    --sync-option CreateNamespace=true
+# argocd app create aspnet \
+#     --repo https://github.com/johankardell/argocd-demo \
+#     --path ./aspnet/ \
+#     --dest-namespace aspnet \
+#     --dest-server https://kubernetes.default.svc \
+#     --sync-policy automated \
+#     --sync-option CreateNamespace=true
 
 # Grafana (default user admin/admin) - no pvc
 grafanaPwd=$(k get secret -n grafana grafana -o json | jq '.data.["admin-password"]' -r | base64 -d)
