@@ -34,11 +34,14 @@ az aks nodepool add \
     --cluster-name $CLUSTER_NAME \
     --resource-group $RESOURCE_GROUP_NAME \
     --name $APPS_POOL_NAME \
-    --node-count 1 \
+    --min-count 0 \
+    --max-count 5 \
+    --enable-cluster-autoscaler \
     --node-vm-size standard_d4ads_v5 \
     --node-osdisk-size 120 \
     --ssh-access disabled \
     --max-pods 250 \
+    --labels nginx="true" \
     --os-sku AzureLinux \
     --no-wait
 
@@ -66,15 +69,8 @@ az aks nodepool add \
     --os-type Windows \
     --os-sku Windows2022 \
     --max-pods 250 \
+    --node-taints windows=true:NoSchedule \
     --no-wait
-
-# Wait until Apps nodepool is ready
-
-az aks nodepool update \
-    --cluster-name $CLUSTER_NAME \
-    --resource-group $RESOURCE_GROUP_NAME \
-    --name $APPS_POOL_NAME \
-    --labels nginx="true"
 
 KUBELET_CLIENT_ID=$(az aks show --resource-group $RESOURCE_GROUP_NAME --name $CLUSTER_NAME --query identityProfile.kubeletidentity.clientId -o tsv)
 KUBELET_OBJECT_ID=$(az aks show --resource-group $RESOURCE_GROUP_NAME --name $CLUSTER_NAME --query identityProfile.kubeletidentity.objectId -o tsv)
@@ -109,11 +105,20 @@ argocd app create nginx \
     --sync-policy automated \
     --sync-option CreateNamespace=true
 
-argocd app create grafana \
-    --repo https://grafana.github.io/helm-charts \
-    --helm-chart grafana \
-    --revision 8.5.8 \
-    --dest-namespace grafana \
+# Grafana without pvc
+# argocd app create grafana \
+#     --repo https://grafana.github.io/helm-charts \
+#     --helm-chart grafana \
+#     --revision 8.5.8 \
+#     --dest-namespace grafana \
+#     --dest-server https://kubernetes.default.svc \
+#     --sync-policy automated \
+#     --sync-option CreateNamespace=true
+
+argocd app create grafana-pvc \
+    --repo https://github.com/johankardell/argocd-demo \
+    --path ./grafana-pvc/ \
+    --dest-namespace grafana-pvc \
     --dest-server https://kubernetes.default.svc \
     --sync-policy automated \
     --sync-option CreateNamespace=true
@@ -151,9 +156,19 @@ argocd app create aspnet \
     --sync-policy automated \
     --sync-option CreateNamespace=true
 
-# Grafana (default user admin)
+# Grafana (default user admin/admin) - no pvc
 grafanaPwd=$(k get secret -n grafana grafana -o json | jq '.data.["admin-password"]' -r | base64 -d)
 echo $grafanaPwd
 k port-forward svc/grafana -n grafana 3000:80
+
 # Add Loki as source in Grafana: http://loki-gateway.loki.svc
+
+argocd app delete aspnet -y
+argocd app delete fluentbit-helm -y
+argocd app delete logger -y
+argocd app delete loki-helm -y
+argocd app delete grafana-pvc -y
+argocd app delete nginx -y
+argocd app delete grafana -y
+
 
