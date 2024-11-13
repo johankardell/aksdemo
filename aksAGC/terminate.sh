@@ -1,0 +1,1 @@
+az stack sub delete --delete-all -n rg-aks-agc-demo --yes
