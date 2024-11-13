@@ -22,6 +22,7 @@ param logAnalyticsWorkspaceId string
 
 param aksidname string
 param managementIP string
+param subnetid string
 
 var k8sVersion = '1.31.1'
 var nodeVersion = '1.31.1'
@@ -31,7 +32,7 @@ resource aksid 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   location: location
 }
 
-resource aks 'Microsoft.ContainerService/managedClusters@2023-07-02-preview' = {
+resource aks 'Microsoft.ContainerService/managedClusters@2024-08-01' = {
   name: clusterName
   location: location
   identity: {
@@ -50,15 +51,16 @@ resource aks 'Microsoft.ContainerService/managedClusters@2023-07-02-preview' = {
     nodeResourceGroup: 'rg-${clusterName}-infra'
     networkProfile: {
       networkPlugin: 'azure'
-      networkPluginMode: 'dynamic'
+      networkPluginMode: 'overlay'
       podCidr: '192.168.0.0/16'
+      networkDataplane: 'cilium'
     }
     disableLocalAccounts: true
-    // apiServerAccessProfile: {
-    //   authorizedIPRanges: [
-    //     managementIP
-    //   ]
-    // }
+    apiServerAccessProfile: {
+      authorizedIPRanges: [
+        managementIP
+      ]
+    }
     aadProfile: {
       managed: true
       enableAzureRBAC: true
@@ -79,6 +81,7 @@ resource aks 'Microsoft.ContainerService/managedClusters@2023-07-02-preview' = {
         orchestratorVersion: nodeVersion
         minCount: 1
         maxCount: 5
+        vnetSubnetID: subnetid
       }
       {
         name: 'apps'
@@ -92,6 +95,7 @@ resource aks 'Microsoft.ContainerService/managedClusters@2023-07-02-preview' = {
         orchestratorVersion: nodeVersion
         minCount: 0
         maxCount: 10
+        vnetSubnetID: subnetid
       }
     ]
     linuxProfile: {
@@ -104,9 +108,21 @@ resource aks 'Microsoft.ContainerService/managedClusters@2023-07-02-preview' = {
         ]
       }
     }
+    securityProfile: {
+      imageCleaner: {
+        enabled: true
+        intervalHours: 168
+      }
+    }
+    workloadAutoScalerProfile: {
+      keda: {
+        enabled: true
+      }
+    }
     autoUpgradeProfile: {
       upgradeChannel: 'patch'
       nodeOSUpgradeChannel: 'NodeImage'
+
     }
     storageProfile: {
       diskCSIDriver: {

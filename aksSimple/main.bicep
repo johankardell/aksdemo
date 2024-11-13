@@ -1,7 +1,7 @@
 targetScope = 'subscription'
 
 var rgName = 'rg-aks-simple-demo'
-param location string = 'swedencentral'
+param location string = deployment().location
 var laName = 'la-simple-demo'
 var aksName = 'aks-simple-demo'
 var acrName = 'jkacrsimpledemo'
@@ -25,6 +25,15 @@ module la 'logAnalytics.bicep' = {
   }
 }
 
+module vnet 'vnet.bicep' = {
+  scope: rg
+  name: 'vnet'
+  params: {
+    name: aksName
+    location: location
+  }
+}
+
 module aks 'aks.bicep' = {
   scope: rg
   name: aksName
@@ -37,6 +46,7 @@ module aks 'aks.bicep' = {
     logAnalyticsWorkspaceId: la.outputs.id
     aksidname: aksidname
     managementIP: managementIP
+    subnetid: vnet.outputs.akssubnetid
   }
 }
 
