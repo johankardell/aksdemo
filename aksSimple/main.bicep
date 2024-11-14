@@ -25,15 +25,6 @@ module la 'logAnalytics.bicep' = {
   }
 }
 
-module vnet 'vnet.bicep' = {
-  scope: rg
-  name: 'vnet'
-  params: {
-    name: aksName
-    location: location
-  }
-}
-
 module aks 'aks.bicep' = {
   scope: rg
   name: aksName
@@ -46,7 +37,6 @@ module aks 'aks.bicep' = {
     logAnalyticsWorkspaceId: la.outputs.id
     aksidname: aksidname
     managementIP: managementIP
-    subnetid: vnet.outputs.akssubnetid
   }
 }
 

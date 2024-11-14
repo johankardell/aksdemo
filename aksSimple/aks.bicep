@@ -22,7 +22,6 @@ param logAnalyticsWorkspaceId string
 
 param aksidname string
 param managementIP string
-param subnetid string
 
 var k8sVersion = '1.31.1'
 var nodeVersion = '1.31.1'
@@ -81,7 +80,6 @@ resource aks 'Microsoft.ContainerService/managedClusters@2024-08-01' = {
         orchestratorVersion: nodeVersion
         minCount: 1
         maxCount: 5
-        vnetSubnetID: subnetid
       }
       {
         name: 'apps'
@@ -95,7 +93,6 @@ resource aks 'Microsoft.ContainerService/managedClusters@2024-08-01' = {
         orchestratorVersion: nodeVersion
         minCount: 0
         maxCount: 10
-        vnetSubnetID: subnetid
       }
     ]
     linuxProfile: {
