@@ -4,7 +4,6 @@ param location string = 'swedencentral'
 
 var rgName = 'rg-aks-gitopsEnterprise-demo'
 var laName = 'la-gitopsEnterprise-demo'
-var aksName = 'aks-gitopsEnterprise-demo'
 var vnetLzName = 'vnet-lz-gitopsEnterprise-demo'
 var vnetHubName = 'vnet-hub-gitopsEnterprise-demo'
 var bastionName = 'bastion-gitopsEnterprise-demo'
@@ -106,25 +105,6 @@ module privatednszone 'modules/privatednszone.bicep' = {
   ]
 }
 
-module aks 'modules/aks.bicep' = {
-  scope: rg
-  name: aksName
-  params: {
-    location: location
-    clusterName: aksName 
-    dnsPrefix: aksName
-    linuxAdminUsername: 'aksuser'
-    sshRSAPublicKey: sshkey
-    logAnalyticsWorkspaceId: la.outputs.id
-    subnetid: vnetlz.outputs.akssubnetid
-    aksidname: miname
-    privateDnsZoneId: privatednszone.outputs.privateDNSZoneId
-  }
-  dependsOn: [
-    aksmi
-  ]
-}
-
 module azfw 'modules/azurefirewall.bicep' = {
   scope: rg
   name: azfwname
@@ -137,13 +117,14 @@ module azfw 'modules/azurefirewall.bicep' = {
   }
 }
 
-module appgw 'modules/appgw.bicep' = {
-  scope: rg
-  name: appgwname
-  params: {
-    appurl: '10.1.15.250'
-    location: location
-    name: appgwname
-    subnetId: vnetlz.outputs.appgwsubnetid
-  }
-}
+// Switch to Appgw for containers?
+// module appgw 'modules/appgw.bicep' = {
+//   scope: rg
+//   name: appgwname
+//   params: {
+//     appurl: '10.1.15.250'
+//     location: location
+//     name: appgwname
+//     subnetId: vnetlz.outputs.appgwsubnetid
+//   }
+// }

@@ -21,8 +21,8 @@ param aksidname string
 param subnetid string
 param privateDnsZoneId string
 
-var k8sVersion = '1.29.0'
-var nodeVersion = '1.29.0'
+var k8sVersion = '1.31'
+var nodeVersion = '1.31'
 
 var aksadmingroup = '1edf6441-ba72-4c12-af38-a71b56a37116'
 
@@ -30,7 +30,7 @@ resource aksid 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' exi
   name: aksidname
 }
 
-resource aks 'Microsoft.ContainerService/managedClusters@2023-10-02-preview' = {
+resource aks 'Microsoft.ContainerService/managedClusters@2024-06-02-preview' = {
   name: clusterName
   location: location
   identity: {
@@ -45,13 +45,17 @@ resource aks 'Microsoft.ContainerService/managedClusters@2023-10-02-preview' = {
   }
   properties: {
     dnsPrefix: dnsPrefix
+    nodeResourceGroupProfile: {
+      restrictionLevel: 'ReadOnly'
+    }
     kubernetesVersion: k8sVersion
     nodeResourceGroup: 'rg-${clusterName}-infra'
     // disableLocalAccounts: true // breaks Flux
     networkProfile: {
       networkPlugin: 'azure'
       networkPluginMode: 'overlay'
-      outboundType: 'userDefinedRouting' // ingress egress via AZFW
+      outboundType: 'none' // preview functionality
+      // outboundType: 'userDefinedRouting' // ingress egress via AZFW
       // outboundType: 'managedNATGateway' // doesn't seem to work. deployment fails. need to investigate.
       // outboundType: 'loadBalancer' // ingress via LB, egress via AZFW 
     }
@@ -83,7 +87,7 @@ resource aks 'Microsoft.ContainerService/managedClusters@2023-10-02-preview' = {
         count: agentCount
         vmSize: sysVMSize
         osType: 'Linux'
-        osSKU: 'AzureLinux'
+        osSKU: 'Ubuntu' // AzureLinux not supported for Outboundtype: none
         mode: 'System'
         enableAutoScaling: true
         orchestratorVersion: nodeVersion
@@ -104,7 +108,7 @@ resource aks 'Microsoft.ContainerService/managedClusters@2023-10-02-preview' = {
         count: 1
         vmSize: appsVMSize
         osType: 'Linux'
-        osSKU: 'AzureLinux'
+        osSKU: 'Ubuntu'
         mode: 'User'
         enableAutoScaling: true
         orchestratorVersion: nodeVersion
@@ -150,7 +154,7 @@ resource aks 'Microsoft.ContainerService/managedClusters@2023-10-02-preview' = {
     }
     storageProfile: {
       diskCSIDriver: {
-      enabled: true
+        enabled: true
       }
       fileCSIDriver: {
         enabled: true
@@ -158,6 +162,9 @@ resource aks 'Microsoft.ContainerService/managedClusters@2023-10-02-preview' = {
       snapshotController: {
         enabled: true
       }
+    }
+    bootstrapProfile: {
+      artifactSource: 'Cache'
     }
     addonProfiles: {
       omsagent: {
@@ -169,7 +176,6 @@ resource aks 'Microsoft.ContainerService/managedClusters@2023-10-02-preview' = {
     }
   }
 }
-
 
 // https://samcogan.com/enable-aks-flux-extension-with-infrastructure-as-code/
 
@@ -188,7 +194,6 @@ resource aks 'Microsoft.ContainerService/managedClusters@2023-10-02-preview' = {
 //     autoUpgradeMinorVersion: true
 //   }
 // }
-
 
 // resource fluxConfig 'Microsoft.KubernetesConfiguration/fluxConfigurations@2023-05-01' = {
 //   name: 'flux-demo'

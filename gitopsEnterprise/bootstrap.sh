@@ -1,5 +1,5 @@
 sshKey=`cat ~/.ssh/id_rsa.pub`
-location="francecentral"
+location="swedencentral"
 
 IP="$(curl ipinfo.io/ip 2>/dev/null)"
 

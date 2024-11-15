@@ -1,7 +1,8 @@
-az extension add --name ssh
-chmod 0700 ~/.ssh
-chmod 0600 ~/.ssh/id_rsa
-chmod 0600 ~/.ssh/id_rsa.pub
+# Prereqs
+# az extension add --name ssh
+# chmod 0700 ~/.ssh
+# chmod 0600 ~/.ssh/id_rsa
+# chmod 0600 ~/.ssh/id_rsa.pub
 
 rg="rg-aks-gitopsEnterprise-demo"
 vm="vm-ubuntu"
@@ -22,7 +23,6 @@ az network bastion ssh --name $bastion --resource-group $rg --target-resource-id
 
 # login to the tenant (do not add tenantid to public githubrepo)
 # az login -t <tenantid>
-# az account set -s aks
 # az aks get-credentials -g rg-aks-gitopsEnterprise-demo -n aks-gitopsEnterprise-demo --format azure
 # kubelogin convert-kubeconfig -l azurecli
 # alias k=kubectl

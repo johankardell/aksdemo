@@ -15,6 +15,7 @@ resource vnet 'Microsoft.Network/virtualNetworks@2023-06-01' = {
         name: 'aks'
         properties: {
           addressPrefix: '10.1.0.0/20'
+          defaultOutboundAccess: false
           networkSecurityGroup: {
             id: nsgaks.id
           }
@@ -27,6 +28,7 @@ resource vnet 'Microsoft.Network/virtualNetworks@2023-06-01' = {
         name: 'iaas'
         properties: {
           addressPrefix: '10.1.16.0/24'
+          defaultOutboundAccess: false
           networkSecurityGroup: {
             id: nsgiaas.id
           }
@@ -39,6 +41,7 @@ resource vnet 'Microsoft.Network/virtualNetworks@2023-06-01' = {
         name: 'appgw'
         properties: {
           addressPrefix: '10.1.17.0/24'
+          defaultOutboundAccess: false
           networkSecurityGroup: {
             id: nsgappgw.id
           }
