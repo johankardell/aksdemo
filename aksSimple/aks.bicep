@@ -26,7 +26,7 @@ param managementIP string
 var k8sVersion = '1.31.1'
 var nodeVersion = '1.31.1'
 
-resource aksid 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
+resource aksid 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-07-31-preview' = {
   name: aksidname
   location: location
 }
