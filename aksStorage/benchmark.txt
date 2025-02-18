@@ -1,0 +1,55 @@
+#Devbox for reference
+Run status group 0 (all jobs):
+   READ: bw=26.0MiB/s (27.3MB/s), 3249KiB/s-3416KiB/s (3327kB/s-3498kB/s), io=1565MiB (1641MB), run=60172-60173msec
+  WRITE: bw=26.0MiB/s (27.2MB/s), 3245KiB/s-3405KiB/s (3323kB/s-3486kB/s), io=1563MiB (1639MB), run=60172-60173msec
+
+#Laptop for reference
+Run status group 0 (all jobs):
+   READ: bw=177MiB/s (186MB/s), 22.0MiB/s-22.3MiB/s (23.1MB/s-23.4MB/s), io=10.4GiB (11.1GB), run=60002-60003msec
+  WRITE: bw=177MiB/s (186MB/s), 22.0MiB/s-22.3MiB/s (23.1MB/s-23.4MB/s), io=10.4GiB (11.2GB), run=60002-60003msec
+
+Disk stats (read/write):
+  sdc: ios=2720219/2721895, sectors=21761760/21820712, merge=0/205, ticks=1402680/4516860, in_queue=5919660, util=100.00%
+
+
+# AKS Clusters running in Sweden central
+# Standard_D8lds_v6 NVME (Cluster 1)
+Run status group 0 (all jobs):
+   READ: bw=75.7MiB/s (79.4MB/s), 9563KiB/s-9760KiB/s (9793kB/s-9994kB/s), io=4543MiB (4764MB), run=60010-60010msec
+  WRITE: bw=75.8MiB/s (79.5MB/s), 9601KiB/s-9765KiB/s (9831kB/s-9999kB/s), io=4548MiB (4769MB), run=60010-60010msec
+
+Disk stats (read/write):
+  nvme0n1: ios=1158695/1160091, sectors=9269560/9280872, merge=0/18, ticks=1816045/1821755, in_queue=3637833, util=99.87%
+
+# Standard_D16ads_v5 Temp (Cluster 2)
+Run status group 0 (all jobs):
+   READ: bw=126MiB/s (133MB/s), 15.3MiB/s-16.2MiB/s (16.0MB/s-16.9MB/s), io=7589MiB (7957MB), run=60001-60002msec
+  WRITE: bw=127MiB/s (133MB/s), 15.3MiB/s-16.2MiB/s (16.1MB/s-16.9MB/s), io=7596MiB (7965MB), run=60001-60002msec
+
+Disk stats (read/write):
+  nvme0n1: ios=1940006/1942055, sectors=15520048/15536584, merge=0/18, ticks=1867973/1762194, in_queue=3630192, util=99.88%
+
+# Standard_L8as_v3 NVME (Cluster 3)
+Run status group 0 (all jobs):
+   READ: bw=125MiB/s (131MB/s), 15.6MiB/s-15.8MiB/s (16.3MB/s-16.6MB/s), io=7523MiB (7889MB), run=60001-60001msec
+  WRITE: bw=126MiB/s (132MB/s), 15.6MiB/s-15.8MiB/s (16.3MB/s-16.6MB/s), io=7531MiB (7897MB), run=60001-60001msec
+
+Disk stats (read/write):
+  nvme1n1: ios=1919851/1922055, sectors=15358808/15376584, merge=0/18, ticks=1904718/1682141, in_queue=3586876, util=99.87%
+
+# Standard_L8as_v3 Temp (Cluster 4)
+Run status group 0 (all jobs):
+   READ: bw=8149KiB/s (8345kB/s), 1003KiB/s-1040KiB/s (1027kB/s-1065kB/s), io=478MiB (501MB), run=60008-60009msec
+  WRITE: bw=8147KiB/s (8343kB/s), 997KiB/s-1036KiB/s (1021kB/s-1061kB/s), io=477MiB (501MB), run=60008-60009msec
+
+Disk stats (read/write):
+  nvme1n1: ios=121912/121915, sectors=975296/975464, merge=0/18, ticks=1812932/1826574, in_queue=3639848, util=99.75%
+
+# Standard_D8ads_v5 Temp (Cluster 5)
+Run status group 0 (all jobs):
+   READ: bw=75.7MiB/s (79.4MB/s), 9660KiB/s-9723KiB/s (9892kB/s-9957kB/s), io=4542MiB (4763MB), run=60008-60008msec
+  WRITE: bw=75.8MiB/s (79.5MB/s), 9654KiB/s-9740KiB/s (9886kB/s-9974kB/s), io=4547MiB (4768MB), run=60008-60008msec
+
+Disk stats (read/write):
+  nvme0n1: ios=1159884/1161122, sectors=9279072/9289120, merge=0/18, ticks=1822754/1817731, in_queue=3640517, util=99.88%
+

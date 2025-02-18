@@ -1,0 +1,31 @@
+#https://learn.microsoft.com/en-us/azure/storage/container-storage/use-container-storage-with-temp-ssd#3-deploy-a-pod-with-a-generic-ephemeral-volume
+
+kind: Pod
+apiVersion: v1
+metadata:
+  name: fiopod
+spec:
+  nodeSelector:
+    acstor.azure.com/io-engine: acstor
+  containers:
+    - name: fio
+      image: ubuntu:oracular
+      args:
+        - sleep
+        - "infinity"
+      volumeMounts:
+        - mountPath: "/volume"
+          name: tempvolume
+  volumes:
+    - name: tempvolume
+      ephemeral:
+        volumeClaimTemplate:
+          metadata:
+            labels:
+              type: my-ephemeral-volume
+          spec:
+            accessModes: [ "ReadWriteOnce" ]
+            storageClassName: acstor-ephemeraldisk-temp # replace with the name of your storage class if different
+            resources:
+              requests:
+                storage: 10Gi
