@@ -29,15 +29,15 @@ Run status group 0 (all jobs):
 Disk stats (read/write):
   nvme0n1: ios=1940006/1942055, sectors=15520048/15536584, merge=0/18, ticks=1867973/1762194, in_queue=3630192, util=99.88%
 
-# Standard_L8as_v3 NVME (Cluster 3)
+# Standard_L8s_v3 NVME (Cluster 3)
 Run status group 0 (all jobs):
-   READ: bw=125MiB/s (131MB/s), 15.6MiB/s-15.8MiB/s (16.3MB/s-16.6MB/s), io=7523MiB (7889MB), run=60001-60001msec
-  WRITE: bw=126MiB/s (132MB/s), 15.6MiB/s-15.8MiB/s (16.3MB/s-16.6MB/s), io=7531MiB (7897MB), run=60001-60001msec
+   READ: bw=194MiB/s (204MB/s), 24.2MiB/s-24.4MiB/s (25.4MB/s-25.5MB/s), io=11.4GiB (12.2GB), run=60001-60001msec
+  WRITE: bw=194MiB/s (204MB/s), 24.2MiB/s-24.4MiB/s (25.4MB/s-25.6MB/s), io=11.4GiB (12.2GB), run=60001-60001msec
 
 Disk stats (read/write):
-  nvme1n1: ios=1919851/1922055, sectors=15358808/15376584, merge=0/18, ticks=1904718/1682141, in_queue=3586876, util=99.87%
+  nvme1n1: ios=2985343/2990978, sectors=23882744/25066872, merge=0/29, ticks=2000116/1590622, in_queue=3590940, util=99.88%
 
-# Standard_L8as_v3 Temp (Cluster 4)
+# Standard_L8s_v3 Temp (Cluster 4)
 Run status group 0 (all jobs):
    READ: bw=8149KiB/s (8345kB/s), 1003KiB/s-1040KiB/s (1027kB/s-1065kB/s), io=478MiB (501MB), run=60008-60009msec
   WRITE: bw=8147KiB/s (8343kB/s), 997KiB/s-1036KiB/s (1021kB/s-1061kB/s), io=477MiB (501MB), run=60008-60009msec
@@ -53,3 +53,29 @@ Run status group 0 (all jobs):
 Disk stats (read/write):
   nvme0n1: ios=1159884/1161122, sectors=9279072/9289120, merge=0/18, ticks=1822754/1817731, in_queue=3640517, util=99.88%
 
+# Standard_L8s_v3 NVME, Container storage premium (same command as all other benchmarks)
+# Command: fio --name=benchtest --size=800m --filename=/volume/test --direct=1 --rw=randrw --ioengine=libaio --bs=4k --iodepth=16 --numjobs=8 --time_based --runtime=60
+Run status group 0 (all jobs):
+   READ: bw=62.7MiB/s (65.8MB/s), 7959KiB/s-8073KiB/s (8150kB/s-8267kB/s), io=6188MiB (6489MB), run=98673-98674msec
+  WRITE: bw=62.8MiB/s (65.8MB/s), 7965KiB/s-8103KiB/s (8156kB/s-8298kB/s), io=6195MiB (6496MB), run=98673-98674msec
+
+Disk stats (read/write):
+  nvme1n1: ios=0/0, sectors=0/0, merge=0/0, ticks=0/0, in_queue=0, util=0.00%
+
+# Standard_L8s_v3 NVME, Container storage premium (higher iodepth)
+# Command: fio --name=benchtest --size=800m --filename=/volume/test --direct=1 --rw=randrw --ioengine=libaio --bs=4k --iodepth=32 --numjobs=8 --time_based --runtime=60
+Run status group 0 (all jobs):
+   READ: bw=185MiB/s (194MB/s), 23.0MiB/s-23.4MiB/s (24.1MB/s-24.5MB/s), io=10.9GiB (11.7GB), run=60001-60001msec
+  WRITE: bw=186MiB/s (195MB/s), 23.1MiB/s-23.4MiB/s (24.2MB/s-24.6MB/s), io=10.9GiB (11.7GB), run=60001-60001msec
+
+Disk stats (read/write):
+  nvme1n1: ios=0/0, sectors=0/0, merge=0/0, ticks=0/0, in_queue=0, util=0.00%
+
+# Standard_L8s_v3 NVME, Container storage premium (4 jobs, should be optimal since we're using 8 cores)
+# Command: fio --name=benchtest --size=800m --filename=/volume/test --direct=1 --rw=randrw --ioengine=libaio --bs=4k --iodepth=32 --numjobs=4 --time_based --runtime=60
+Run status group 0 (all jobs):
+   READ: bw=192MiB/s (201MB/s), 47.6MiB/s-48.7MiB/s (49.9MB/s-51.0MB/s), io=11.2GiB (12.1GB), run=60001-60001msec
+  WRITE: bw=192MiB/s (201MB/s), 47.6MiB/s-48.8MiB/s (49.9MB/s-51.1MB/s), io=11.2GiB (12.1GB), run=60001-60001msec
+
+Disk stats (read/write):
+  nvme1n1: ios=0/0, sectors=0/0, merge=0/0, ticks=0/0, in_queue=0, util=0.00%
