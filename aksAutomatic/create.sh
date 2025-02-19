@@ -8,7 +8,7 @@ az feature register --namespace Microsoft.ContainerService --name AutomaticSKUPr
 az feature show --namespace Microsoft.ContainerService --name AutomaticSKUPreview
 
 az group create -n rg-aksauto -l swedencentral
-az aks create --resource-group rg-aksauto --name aksauto --sku automatic
+az aks create --resource-group rg-aksauto --name aksauto --sku automatic --ssh-access disabled
 
 az aks get-credentials -g rg-aksauto -n aksauto --format azure
 kubelogin convert-kubeconfig -l azurecli
