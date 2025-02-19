@@ -76,13 +76,16 @@ az fleet create --resource-group ${RESOURCE_GROUP} --name ${FLEET} --location $L
 
 wait
 
-# benchmark
+# apply the correct K8s manifest to each cluster. NVME or Temp.
+
+# benchmark - the manifests deploys a pod named fiopod. Exec into it and run.
 k exec -it fiopod -- /bin/bash
 apt update && apt install -y fio
 fio --name=benchtest --size=800m --filename=/volume/test --direct=1 --rw=randrw --ioengine=libaio --bs=4k --iodepth=16 --numjobs=8 --time_based --runtime=60
 
 
-break
+
+# when done - delete everything
 
 az account set --subscription $SUBSCRIPTION_ID
 az group delete -n $RESOURCE_GROUP --no-wait
