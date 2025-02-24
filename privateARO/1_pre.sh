@@ -37,16 +37,16 @@ ARO_IDENTITY_NAME=aro-msi
 JUMPBOX_LINUX_VM_NAME=Jumpbox-VM
 JUMPBOX_WINDOWS_VM_NAME=jumpbox-winvm
 
-JUMPBOX_PASSWORD="changeme" # Change this
+JUMPBOX_PASSWORD="24@kfow.4€€fvxx" # Change this
 ARO_CLUSTER_NAME=private-aro
 ACR_NAME=jkarothehardway
 STUDENT_NAME=johan
 DNS_NAME=jkarothehardway
 
-az provider register -n Microsoft.RedHatOpenShift --wait
-az provider register -n Microsoft.Compute --wait
-az provider register -n Microsoft.Network --wait
-az provider register -n Microsoft.Storage --wait
+az provider register -n Microsoft.RedHatOpenShift --no-wait
+az provider register -n Microsoft.Compute --no-wait
+az provider register -n Microsoft.Network --no-wait
+az provider register -n Microsoft.Storage --no-wait
 
 az group create --name $HUB_RG --location $LOCATION
 az group create --name $SPOKE_RG --location $LOCATION

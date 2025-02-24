@@ -15,7 +15,7 @@ sudo az aks install-cli
 sudo usermod -aG docker $USER
 
 az login
-az account set --subscription "one"
+az account set --subscription "five"
 
 
 # Run pre.sh-script to set variables on jumpbox
@@ -23,3 +23,9 @@ az account set --subscription "one"
 az aro list-credentials \
   --name $ARO_CLUSTER_NAME \
   --resource-group $SPOKE_RG
+
+az aro get-admin-kubeconfig   --name $ARO_CLUSTER_NAME   --resource-group $SPOKE_RG
+
+export KUBECONFIG=~/
+
+kubectl get nodes

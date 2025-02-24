@@ -39,8 +39,7 @@ az network private-dns link vnet create \
   --virtual-network $HUB_VNET_ID \
   --registration-enabled false
 
-REGISTRY_ID=$(az acr show --name $ACR_NAME \
-  --query 'id' --output tsv)
+REGISTRY_ID=$(az acr show --name $ACR_NAME --query 'id' --output tsv)
 
 az network private-endpoint create \
     --name ACRPrivateEndpoint \

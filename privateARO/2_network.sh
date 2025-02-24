@@ -140,13 +140,13 @@ az network vnet create \
     --resource-group $SPOKE_RG  \
     --name $SPOKE_VNET_NAME \
     --address-prefixes $SPOKE_VNET_PREFIX \
-    --subnet-name $ARO_MASTER_SUBNET_NAME \
+    --subnet-name $ARO_SUBNET_MASTER_NAME \
     --subnet-prefixes $ARO_SUBNET_MASTER_PREFIX
 
 az network vnet subnet create \
     --resource-group $SPOKE_RG  \
     --vnet-name $SPOKE_VNET_NAME  \
-    --name $ARO_WORKER_SUBNET_NAME \
+    --name $ARO_SUBNET_WORKER_NAME \
     --address-prefixes $ARO_SUBNET_WORKER_PREFIX
 
 az network vnet subnet create \
@@ -205,7 +205,8 @@ az network bastion create \
     --vnet-name $HUB_VNET_NAME \
     --enable-tunneling \
     --enable-ip-connect \
-    --location $LOCATION
+    --location $LOCATION \
+    --no-wait
 
 az vm create \
     --resource-group $HUB_RG \
@@ -217,10 +218,11 @@ az vm create \
     --subnet $JUMPBOX_SUBNET_NAME \
     --size Standard_B2s \
     --storage-sku Standard_LRS \
-    --os-disk-name $JUMPBOX_VM_NAME-osdisk \
+    --os-disk-name $JUMPBOX_LINUX_VM_NAME-osdisk \
     --os-disk-size-gb 128 \
     --public-ip-address "" \
-    --nsg ""  
+    --nsg "" \
+    --no-wait 
 
 az vm create \
     --resource-group $HUB_RG \
@@ -235,7 +237,8 @@ az vm create \
     --os-disk-name $JUMPBOX_WINDOWS_VM_NAME-osdisk \
     --os-disk-size-gb 128 \
     --public-ip-address "" \
-    --nsg "" 
+    --nsg "" \
+    --no-wait
 
 # Create Azure Firewall
 
@@ -264,14 +267,15 @@ az network firewall update \
     --name $FW_NAME \
     --resource-group $HUB_RG 
 
-az network firewall network-rule create -g $HUB_RG -f $FW_NAME --collection-name 'aksfwnr' -n 'apiudp' --protocols 'UDP' --source-addresses '*' --destination-addresses "AzureCloud.$LOCATION" --destination-ports 1194 --action allow --priority 100
-az network firewall network-rule create -g $HUB_RG -f $FW_NAME --collection-name 'aksfwnr' -n 'apitcp' --protocols 'TCP' --source-addresses '*' --destination-addresses "AzureCloud.$LOCATION" --destination-ports 9000
-az network firewall network-rule create -g $HUB_RG -f $FW_NAME --collection-name 'aksfwnr' -n 'time' --protocols 'UDP' --source-addresses '*' --destination-fqdns 'ntp.ubuntu.com' --destination-ports 123
+(
+    az network firewall network-rule create -g $HUB_RG -f $FW_NAME --collection-name 'aksfwnr' -n 'apiudp' --protocols 'UDP' --source-addresses '*' --destination-addresses "AzureCloud.$LOCATION" --destination-ports 1194 --action allow --priority 100
+    az network firewall network-rule create -g $HUB_RG -f $FW_NAME --collection-name 'aksfwnr' -n 'apitcp' --protocols 'TCP' --source-addresses '*' --destination-addresses "AzureCloud.$LOCATION" --destination-ports 9000
+    az network firewall network-rule create -g $HUB_RG -f $FW_NAME --collection-name 'aksfwnr' -n 'time' --protocols 'UDP' --source-addresses '*' --destination-fqdns 'ntp.ubuntu.com' --destination-ports 123
 
-az network firewall application-rule create -g $HUB_RG -f $FW_NAME --collection-name 'required' -n 'aro' --source-addresses '*' --protocols 'https=443' --target-fqdns arosvc.azurecr.io arosvc.swedencentral.data.azurecr.io management.azure.com login.microsoftonline.com "*.monitor.core.windows.net" "*.monitoring.core.windows.net" "*.blob.core.windows.net" "*.servicebus.windows.net" "*.table.core.windows.net" --action allow --priority 100
-az network firewall application-rule create -g $HUB_RG -f $FW_NAME --collection-name 'optional' -n 'aro' --source-addresses '*' --protocols 'https=443' --target-fqdns registry.redhat.io quay.io cdn.quay.io cdn01.quay.io cdn02.quay.io cdn03.quay.io access.redhat.com registry.access.redhat.com registry.connect.redhat.com api.openshift.com mirror.openshift.com --action allow --priority 101
-az network firewall application-rule create -g $HUB_RG -f $FW_NAME --collection-name 'docker' -n 'aro' --source-addresses '*' --protocols 'https=443' --target-fqdns hub.docker.com registry-1.docker.io production.cloudflare.docker.com auth.docker.io --action allow --priority 110
-
+    az network firewall application-rule create -g $HUB_RG -f $FW_NAME --collection-name 'required' -n 'aro' --source-addresses '*' --protocols 'https=443' --target-fqdns arosvc.azurecr.io arosvc.swedencentral.data.azurecr.io management.azure.com login.microsoftonline.com "*.monitor.core.windows.net" "*.monitoring.core.windows.net" "*.blob.core.windows.net" "*.servicebus.windows.net" "*.table.core.windows.net" --action allow --priority 100
+    az network firewall application-rule create -g $HUB_RG -f $FW_NAME --collection-name 'optional' -n 'aro' --source-addresses '*' --protocols 'https=443' --target-fqdns registry.redhat.io quay.io cdn.quay.io cdn01.quay.io cdn02.quay.io cdn03.quay.io access.redhat.com registry.access.redhat.com registry.connect.redhat.com api.openshift.com mirror.openshift.com --action allow --priority 101
+    az network firewall application-rule create -g $HUB_RG -f $FW_NAME --collection-name 'docker' -n 'aro' --source-addresses '*' --protocols 'https=443' --target-fqdns hub.docker.com registry-1.docker.io production.cloudflare.docker.com auth.docker.io --action allow --priority 110
+) &
 
 az network route-table create \
     --resource-group $SPOKE_RG  \
@@ -302,6 +306,12 @@ az network vnet subnet update \
     --vnet-name $SPOKE_VNET_NAME \
     --name $ARO_SUBNET_WORKER_NAME \
     --route-table $ROUTE_TABLE_NAME
+
+
+echo "wait for FW rules to finish before moving to next script"
+
+wait 
+
 
 # DNS_ZONE_NAME=$(az network private-dns zone list --resource-group $NODE_GROUP --query "[0].name" -o tsv)
 # HUB_VNET_ID=$(az network vnet show -g $HUB_RG -n $HUB_VNET_NAME --query id --output tsv)
