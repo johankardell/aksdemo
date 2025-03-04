@@ -1,0 +1,16 @@
+#  k edit nodepool default 
+
+      - key: karpenter.azure.com/sku-name
+        operator: In
+        values:
+        - Standard_D2ads_v5
+        - Standard_D4ads_v5
+        - Standard_D8ads_v5
+        - Standard_D16ads_v5
+        - Standard_D32ads_v5
+
+# only select vm types that have ephemeral disks (don't think this does anything?)
+      - key: karpenter.k8s.azure.com/os-disk-type
+        operator: In
+        values:
+        - Ephemeral
