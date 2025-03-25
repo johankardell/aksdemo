@@ -1,0 +1,12 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: sc-azurefile-csi
+provisioner: file.csi.azure.com # CSI provisioner
+parameters:
+  skuName: Standard_LRS # Change to Premium_LRS if needed
+mountOptions:
+  - dir_mode=0777
+  - file_mode=0777
+  - uid=0
+  - gid=0
