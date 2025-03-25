@@ -30,12 +30,23 @@ Disk stats (read/write):
   nvme0n1: ios=1940006/1942055, sectors=15520048/15536584, merge=0/18, ticks=1867973/1762194, in_queue=3630192, util=99.88%
 
 # Standard_L8s_v3 NVME (Cluster 3)
-Run status group 0 (all jobs):
-   READ: bw=194MiB/s (204MB/s), 24.2MiB/s-24.4MiB/s (25.4MB/s-25.5MB/s), io=11.4GiB (12.2GB), run=60001-60001msec
-  WRITE: bw=194MiB/s (204MB/s), 24.2MiB/s-24.4MiB/s (25.4MB/s-25.6MB/s), io=11.4GiB (12.2GB), run=60001-60001msec
+  Run status group 0 (all jobs):
+    WRITE: bw=1156MiB/s (1212MB/s), 1156MiB/s-1156MiB/s (1212MB/s-1212MB/s), io=31.2GiB (33.6GB), run=27688-27688msec
 
-Disk stats (read/write):
-  nvme1n1: ios=2985343/2990978, sectors=23882744/25066872, merge=0/29, ticks=2000116/1590622, in_queue=3590940, util=99.88%
+  Run status group 1 (all jobs):
+    WRITE: bw=447MiB/s (468MB/s), 447MiB/s-447MiB/s (468MB/s-468MB/s), io=26.2GiB (28.1GB), run=60002-60002msec
+
+  Run status group 2 (all jobs):
+    READ: bw=439MiB/s (460MB/s), 439MiB/s-439MiB/s (460MB/s-460MB/s), io=25.7GiB (27.6GB), run=60001-60001msec
+
+  Run status group 3 (all jobs):
+    WRITE: bw=1263MiB/s (1325MB/s), 1263MiB/s-1263MiB/s (1325MB/s-1325MB/s), io=74.0GiB (79.5GB), run=60021-60021msec
+
+  Run status group 4 (all jobs):
+    READ: bw=1706MiB/s (1789MB/s), 1706MiB/s-1706MiB/s (1789MB/s-1789MB/s), io=100.0GiB (107GB), run=60003-60003msec
+
+  Disk stats (read/write):
+    nvme1n1: ios=8378518/8595733, sectors=263442344/277413064, merge=0/626, ticks=7324777/8809633, in_queue=16134966, util=99.65%
 
 # Standard_L8s_v3 Temp (Cluster 4)
 Run status group 0 (all jobs):
