@@ -24,6 +24,9 @@ resource vnet 'Microsoft.Network/virtualNetworks@2023-06-01' = {
         name: 'agc'
         properties: {
           addressPrefix: '10.1.16.0/24'
+          networkSecurityGroup: {
+            id: nsgaks.id
+          }
           delegations: [
             {
               name: 'Microsoft.ServiceNetworking/trafficControllers'
