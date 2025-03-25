@@ -1,7 +1,6 @@
 #Connect to Jumpbox through Bastion
 
-az network bastion ssh --name bastionhost -g rg-hub --target-ip-address 10.0.0.68 --auth-type password --username azureuser
-
+az network bastion ssh --name bastionhost -g rg-hub --target-ip-address 10.0.0.69 --auth-type password --username azureuser
 
 # Update apt repo
 sudo apt update 
@@ -17,6 +16,10 @@ sudo usermod -aG docker $USER
 az login
 az account set --subscription "five"
 
+wget https://mirror.openshift.com/pub/openshift-v4/clients/oc/latest/linux/oc.tar.gz
+tar -xvf oc.tar.gz
+sudo mv oc /usr/local/bin/
+sudo chmod +x /usr/local/bin/oc
 
 # Run pre.sh-script to set variables on jumpbox
 
