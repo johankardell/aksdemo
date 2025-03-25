@@ -13,3 +13,4 @@ az aks create --resource-group rg-aksauto --name aksauto --sku automatic --ssh-a
 az aks get-credentials -g rg-aksauto -n aksauto --format azure
 kubelogin convert-kubeconfig -l azurecli
 
+kubectl get nodes -o custom-columns=NAME:.metadata.name,INSTANCE-TYPE:.metadata.labels.node\\.kubernetes\\.io/instance-type,ZONE:.metadata.labels.topology\\.kubernetes\\.io/zone
