@@ -1,7 +1,7 @@
 param name string
 param location string
 
-resource vnet 'Microsoft.Network/virtualNetworks@2023-06-01' = {
+resource vnet 'Microsoft.Network/virtualNetworks@2024-05-01' = {
   name: name
   location: location
   properties: {
@@ -54,7 +54,7 @@ resource vnet 'Microsoft.Network/virtualNetworks@2023-06-01' = {
   }
 }
 
-resource nsgaks 'Microsoft.Network/networkSecurityGroups@2023-06-01' = {
+resource nsgaks 'Microsoft.Network/networkSecurityGroups@2024-05-01' = {
   name: 'nsg-aks'
   location: location
   properties: {
@@ -76,7 +76,7 @@ resource nsgaks 'Microsoft.Network/networkSecurityGroups@2023-06-01' = {
   }
 }
 
-resource nsgiaas 'Microsoft.Network/networkSecurityGroups@2023-06-01' = {
+resource nsgiaas 'Microsoft.Network/networkSecurityGroups@2024-05-01' = {
   name: 'nsg-iaas'
   location: location
   properties: {
@@ -98,7 +98,7 @@ resource nsgiaas 'Microsoft.Network/networkSecurityGroups@2023-06-01' = {
   }
 }
 
-resource nsgappgw 'Microsoft.Network/networkSecurityGroups@2023-06-01' = {
+resource nsgappgw 'Microsoft.Network/networkSecurityGroups@2024-05-01' = {
   name: 'nsg-appgw'
   location: location
   properties: {
@@ -133,7 +133,7 @@ resource nsgappgw 'Microsoft.Network/networkSecurityGroups@2023-06-01' = {
   }
 }
 
-resource routetableAKS 'Microsoft.Network/routeTables@2023-09-01' = {
+resource routetableAKS 'Microsoft.Network/routeTables@2024-05-01' = {
   name: 'rt-aks'
   location: location
   properties: {
@@ -150,7 +150,7 @@ resource routetableAKS 'Microsoft.Network/routeTables@2023-09-01' = {
   }
 }
 
-resource routetableIaaS 'Microsoft.Network/routeTables@2023-09-01' = {
+resource routetableIaaS 'Microsoft.Network/routeTables@2024-05-01' = {
   name: 'rt-iaas'
   location: location
   properties: {
@@ -167,7 +167,7 @@ resource routetableIaaS 'Microsoft.Network/routeTables@2023-09-01' = {
   }
 }
 
-resource routetableAppgw 'Microsoft.Network/routeTables@2023-09-01' = {
+resource routetableAppgw 'Microsoft.Network/routeTables@2024-05-01' = {
   name: 'rt-appgw'
   location: location
   properties: {

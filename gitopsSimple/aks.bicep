@@ -26,7 +26,7 @@ param logAnalyticsWorkspaceId string
 var k8sVersion = '1.28.3'
 var nodeVersion = '1.28.3'
 
-resource aks 'Microsoft.ContainerService/managedClusters@2023-07-02-preview' = {
+resource aks 'Microsoft.ContainerService/managedClusters@2024-09-01' = {
   name: clusterName
   location: location
   identity: {

@@ -9,7 +9,7 @@ resource aksid 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   location: location
 }
 
-resource miOperatorRbac 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+resource miOperatorRbac 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   scope: resourceGroup()
   name: guid(aksid.id, managedIdentityOperatorDefId, aksidname)
   properties: {
@@ -19,7 +19,7 @@ resource miOperatorRbac 'Microsoft.Authorization/roleAssignments@2020-04-01-prev
   }
 }
 
-resource rgRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+resource rgRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(aksid.id, contributorRoleDefId, aksidname)
   properties: {
     principalId: aksid.properties.principalId

@@ -2,7 +2,7 @@ param name string
 param location string
 param subnetid string
 
-resource publicIp 'Microsoft.Network/publicIPAddresses@2020-11-01' = {
+resource publicIp 'Microsoft.Network/publicIPAddresses@2024-05-01' = {
   name: 'pip-${name}'
   location: location
   sku: {
@@ -14,7 +14,7 @@ resource publicIp 'Microsoft.Network/publicIPAddresses@2020-11-01' = {
   }
 }
 
-resource bastion 'Microsoft.Network/bastionHosts@2023-06-01' = {
+resource bastion 'Microsoft.Network/bastionHosts@2024-05-01' = {
   name: name
   location: location
   sku: {

@@ -15,7 +15,7 @@ var privatednszonename = 'akszone.private.swedencentral.azmk8s.io'
 
 param sshkey string
 
-resource rg 'Microsoft.Resources/resourceGroups@2023-07-01' = {
+resource rg 'Microsoft.Resources/resourceGroups@2024-07-01' = {
   name: rgName
   location: location
 }
@@ -118,13 +118,13 @@ module azfw 'modules/azurefirewall.bicep' = {
 }
 
 // Switch to Appgw for containers?
-// module appgw 'modules/appgw.bicep' = {
-//   scope: rg
-//   name: appgwname
-//   params: {
-//     appurl: '10.1.15.250'
-//     location: location
-//     name: appgwname
-//     subnetId: vnetlz.outputs.appgwsubnetid
-//   }
-// }
+module appgw 'modules/appgw.bicep' = {
+  scope: rg
+  name: appgwname
+  params: {
+    appurl: '10.1.15.250'
+    location: location
+    name: appgwname
+    subnetId: vnetlz.outputs.appgwsubnetid
+  }
+}

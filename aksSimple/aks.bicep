@@ -26,12 +26,12 @@ param managementIP string
 var k8sVersion = '1.31.1'
 var nodeVersion = '1.31.1'
 
-resource aksid 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-07-31-preview' = {
+resource aksid 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: aksidname
   location: location
 }
 
-resource aks 'Microsoft.ContainerService/managedClusters@2024-08-01' = {
+resource aks 'Microsoft.ContainerService/managedClusters@2024-09-01' = {
   name: clusterName
   location: location
   identity: {

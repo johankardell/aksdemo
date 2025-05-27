@@ -1,7 +1,7 @@
 param name string
 param location string
 
-resource vnet 'Microsoft.Network/virtualNetworks@2023-06-01' = {
+resource vnet 'Microsoft.Network/virtualNetworks@2024-05-01' = {
   name: name
   location: location
   properties: {
@@ -41,7 +41,7 @@ resource vnet 'Microsoft.Network/virtualNetworks@2023-06-01' = {
   }
 }
 
-resource nsgaks 'Microsoft.Network/networkSecurityGroups@2023-06-01' = {
+resource nsgaks 'Microsoft.Network/networkSecurityGroups@2024-05-01' = {
   name: 'nsg-aks'
   location: location
   properties: {

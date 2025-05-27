@@ -2,7 +2,7 @@ param location string = resourceGroup().location
 param agcName string
 param subnetid string
 
-resource publicIp 'Microsoft.Network/publicIPAddresses@2022-09-01' = {
+resource publicIp 'Microsoft.Network/publicIPAddresses@2024-05-01' = {
   name: 'pip-agc-aks'
   location: location
   sku: {

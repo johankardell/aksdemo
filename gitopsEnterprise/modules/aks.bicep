@@ -30,7 +30,7 @@ resource aksid 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' exi
   name: aksidname
 }
 
-resource aks 'Microsoft.ContainerService/managedClusters@2024-06-02-preview' = {
+resource aks 'Microsoft.ContainerService/managedClusters@2024-09-01' = {
   name: clusterName
   location: location
   identity: {
@@ -162,9 +162,6 @@ resource aks 'Microsoft.ContainerService/managedClusters@2024-06-02-preview' = {
       snapshotController: {
         enabled: true
       }
-    }
-    bootstrapProfile: {
-      artifactSource: 'Cache'
     }
     addonProfiles: {
       omsagent: {

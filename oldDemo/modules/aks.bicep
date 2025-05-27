@@ -22,7 +22,7 @@ param sshRSAPublicKey string
 
 param dnsPrefix string
 
-resource aks 'Microsoft.ContainerService/managedClusters@2022-05-02-preview' = {
+resource aks 'Microsoft.ContainerService/managedClusters@2024-09-01' = {
   name: clusterName
   location: location
   identity: {

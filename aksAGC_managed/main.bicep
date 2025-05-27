@@ -9,7 +9,7 @@ var aksidname = 'id-aks-managed'
 param sshkey string
 param managementIP string
 
-resource rg 'Microsoft.Resources/resourceGroups@2023-07-01' = {
+resource rg 'Microsoft.Resources/resourceGroups@2024-07-01' = {
   name: rgName
   location: location
 }

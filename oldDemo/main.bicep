@@ -6,7 +6,7 @@ param sshkey string
 
 var aksName = 'aks-test'
 
-resource rg 'Microsoft.Resources/resourceGroups@2022-09-01' = {
+resource rg 'Microsoft.Resources/resourceGroups@2024-07-01' = {
   name: rgName
   location: location
 }

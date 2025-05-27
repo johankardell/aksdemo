@@ -4,7 +4,7 @@ param adminUsername string
 param location string = resourceGroup().location
 param publicKey string
 
-resource vm 'Microsoft.Compute/virtualMachines@2021-04-01' = {
+resource vm 'Microsoft.Compute/virtualMachines@2024-07-01' = {
   name: name
   location: location
   properties: {
@@ -47,7 +47,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2021-04-01' = {
   }
 }
 
-resource nic 'Microsoft.Network/networkInterfaces@2021-02-01' = {
+resource nic 'Microsoft.Network/networkInterfaces@2024-05-01' = {
   name: '${name}-nic'
   location: location
   properties: {

@@ -11,7 +11,7 @@ param sshkey string
 param managementIP string
 param deployACR bool
 
-resource rg 'Microsoft.Resources/resourceGroups@2023-07-01' = {
+resource rg 'Microsoft.Resources/resourceGroups@2024-07-01' = {
   name: rgName
   location: location
 }
@@ -58,7 +58,4 @@ module acr 'acr.bicep' = if (deployACR) {
     location: location
     aksid: aks.outputs.akskubeletid
   }
-  dependsOn: [
-    aks
-  ]
 }

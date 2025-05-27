@@ -4,7 +4,7 @@ param laName string
 param location string = resourceGroup().location
 
 //create a log analytics workspace for container insights
-resource law 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
+resource law 'Microsoft.OperationalInsights/workspaces@2023-09-01' = {
   name: laName
   location: location
   properties: {

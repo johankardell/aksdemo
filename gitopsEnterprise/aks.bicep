@@ -12,11 +12,11 @@ resource privatednszone 'Microsoft.Network/privateDnsZones@2024-06-01' existing 
   name: privatednszonename
 }
 
-resource vnetlz 'Microsoft.Network/virtualNetworks@2024-03-01' existing = {
+resource vnetlz 'Microsoft.Network/virtualNetworks@2024-05-01' existing = {
   name: vnetLzName
 }
 
-resource la 'Microsoft.OperationalInsights/workspaces@2022-10-01' existing = {
+resource la 'Microsoft.OperationalInsights/workspaces@2023-09-01' existing = {
   name: laName
 }
 

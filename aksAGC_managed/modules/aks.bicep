@@ -31,7 +31,7 @@ resource aksid 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' exi
   name: aksidname
 }
 
-resource aks 'Microsoft.ContainerService/managedClusters@2024-08-01' = {
+resource aks 'Microsoft.ContainerService/managedClusters@2024-09-01' = {
   name: clusterName
   location: location
   identity: {

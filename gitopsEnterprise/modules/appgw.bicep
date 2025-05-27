@@ -5,7 +5,7 @@ param subnetId string
 param pipname string = 'pip-${name}'
 param appurl string
 
-resource pip 'Microsoft.Network/publicIPAddresses@2023-05-01' = {
+resource pip 'Microsoft.Network/publicIPAddresses@2024-05-01' = {
   name: pipname
   location: location
   sku: {
@@ -16,7 +16,7 @@ resource pip 'Microsoft.Network/publicIPAddresses@2023-05-01' = {
     publicIPAllocationMethod: 'Static'
   }
 }
-resource appgw 'Microsoft.Network/applicationGateways@2023-05-01' = {
+resource appgw 'Microsoft.Network/applicationGateways@2024-05-01' = {
   name: name
   location: location
   properties: {

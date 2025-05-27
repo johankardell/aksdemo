@@ -4,7 +4,7 @@ param firewallSubnetId string
 param firewallManagementSubnetId string
 param workspaceid string
 
-resource publicIP 'Microsoft.Network/publicIPAddresses@2023-09-01' = {
+resource publicIP 'Microsoft.Network/publicIPAddresses@2024-05-01' = {
   name: '${firewallName}-pip'
   location: location
   sku: {
@@ -16,7 +16,7 @@ resource publicIP 'Microsoft.Network/publicIPAddresses@2023-09-01' = {
   }
 }
 
-resource publicIPManagement 'Microsoft.Network/publicIPAddresses@2023-09-01' = {
+resource publicIPManagement 'Microsoft.Network/publicIPAddresses@2024-05-01' = {
   name: '${firewallName}-mgmt-pip'
   location: location
   sku: {
@@ -28,7 +28,7 @@ resource publicIPManagement 'Microsoft.Network/publicIPAddresses@2023-09-01' = {
   }
 }
 
-resource firewallPolicy 'Microsoft.Network/firewallPolicies@2020-11-01' = {
+resource firewallPolicy 'Microsoft.Network/firewallPolicies@2024-05-01' = {
   name: '${firewallName}-policy'
   location: location
   properties: {
@@ -39,7 +39,7 @@ resource firewallPolicy 'Microsoft.Network/firewallPolicies@2020-11-01' = {
   }
 }
 
-resource azFWPolRule 'Microsoft.Network/firewallPolicies/ruleCollectionGroups@2021-03-01' = {
+resource azFWPolRule 'Microsoft.Network/firewallPolicies/ruleCollectionGroups@2024-05-01' = {
   name: 'AllowAll'
   parent: firewallPolicy
   properties: {
@@ -68,7 +68,7 @@ resource azFWPolRule 'Microsoft.Network/firewallPolicies/ruleCollectionGroups@20
   }
 }
 
-resource firewall 'Microsoft.Network/azureFirewalls@2023-09-01' = {
+resource firewall 'Microsoft.Network/azureFirewalls@2024-05-01' = {
   name: firewallName
   location: location
   properties: {

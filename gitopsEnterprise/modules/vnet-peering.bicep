@@ -1,15 +1,15 @@
 param hubname string
 param lzname string
 
-resource hub 'Microsoft.Network/virtualNetworks@2023-06-01' existing = {
+resource hub 'Microsoft.Network/virtualNetworks@2024-05-01' existing = {
   name: hubname
 }
 
-resource lz 'Microsoft.Network/virtualNetworks@2023-06-01' existing = {
+resource lz 'Microsoft.Network/virtualNetworks@2024-05-01' existing = {
   name: lzname
 }
 
-resource hubtolz 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@2023-06-01' = {
+resource hubtolz 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@2024-05-01' = {
   name: 'hub-to-lz'
   parent: hub
   properties: {
@@ -23,7 +23,7 @@ resource hubtolz 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@2023-
   }
 }
 
-resource lztohub 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@2023-06-01' = {
+resource lztohub 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@2024-05-01' = {
   name: 'lz-to-hub'
   parent: lz
   properties: {
