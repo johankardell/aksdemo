@@ -47,6 +47,17 @@ param wafMode string = 'Prevention'
 @allowed(['Enabled', 'Disabled'])
 param wafState string = 'Enabled'
 
+@description('Service CIDR for Kubernetes services')
+param serviceCidr string = '172.16.0.0/16'
+
+@description('Pod CIDR for overlay networking')
+param podCidr string = '192.168.0.0/16'
+
+@description('Maximum pods per node (overlay mode supports up to 250)')
+@minValue(30)
+@maxValue(250)
+param maxPods int = 250
+
 // Variables for resource naming
 var resourceNames = {
   vnet: '${baseName}-vnet-${environmentName}'
@@ -104,6 +115,9 @@ module aks 'modules/aks.bicep' = {
     subnetId: vnet.outputs.aksSubnetId
     logAnalyticsWorkspaceId: logAnalytics.outputs.workspaceId
     managedIdentityId: managedIdentity.outputs.identityId
+    serviceCidr: serviceCidr
+    podCidr: podCidr
+    maxPods: maxPods
   }
 }
 

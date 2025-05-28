@@ -214,7 +214,7 @@ Update VM sizes for cost optimization:
 ```json
 {
   "systemNodeVmSize": { "value": "Standard_D2s_v5" },
-  "userNodeVmSize": { "value": "Standard_D4s_v5" }
+  "userNodeVmSize": { "value": "Standard_D2s_v5" }
 }
 ```
 
@@ -222,7 +222,7 @@ Update VM sizes for cost optimization:
 Specify AKS version:
 ```json
 {
-  "kubernetesVersion": { "value": "1.30.6" }
+  "kubernetesVersion": { "value": "1.33" }
 }
 ```
 

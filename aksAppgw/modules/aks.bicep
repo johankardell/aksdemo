@@ -48,6 +48,18 @@ param managedIdentityId string
 @description('DNS prefix for the cluster')
 param dnsPrefix string = name
 
+@description('Service CIDR for Kubernetes services')
+param serviceCidr string = '172.16.0.0/16'
+
+@description('DNS service IP (must be within serviceCidr)')
+param dnsServiceIP string = '172.16.0.10'
+
+@description('Pod CIDR for overlay networking')
+param podCidr string = '192.168.0.0/16'
+
+@description('Maximum number of pods per node')
+param maxPods int = 250
+
 // AKS cluster
 resource aksCluster 'Microsoft.ContainerService/managedClusters@2024-09-01' = {
   name: name
@@ -72,10 +84,13 @@ resource aksCluster 'Microsoft.ContainerService/managedClusters@2024-09-01' = {
     enableRBAC: true
     networkProfile: {
       networkPlugin: 'azure'
-      networkPolicy: 'azure'
-      serviceCidr: '172.16.0.0/16'
-      dnsServiceIP: '172.16.0.10'
+      networkPluginMode: 'overlay'
+      networkDataplane: 'cilium'
+      networkPolicy: 'cilium'
+      serviceCidr: serviceCidr
+      dnsServiceIP: dnsServiceIP
       loadBalancerSku: 'Standard'
+      podCidr: podCidr
     }
     agentPoolProfiles: [
       {
@@ -87,7 +102,7 @@ resource aksCluster 'Microsoft.ContainerService/managedClusters@2024-09-01' = {
         mode: 'System'
         type: 'VirtualMachineScaleSets'
         vnetSubnetID: subnetId
-        maxPods: 30
+        maxPods: maxPods
         enableAutoScaling: true
         minCount: 1
         maxCount: 5
@@ -154,7 +169,7 @@ resource userNodePool 'Microsoft.ContainerService/managedClusters/agentPools@202
     mode: 'User'
     type: 'VirtualMachineScaleSets'
     vnetSubnetID: subnetId
-    maxPods: 30
+    maxPods: maxPods
     enableAutoScaling: true
     minCount: 1
     maxCount: 10

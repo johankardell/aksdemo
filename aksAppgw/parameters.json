@@ -9,7 +9,7 @@
       "value": "Sweden Central"
     },
     "kubernetesVersion": {
-      "value": "1.30.6"
+      "value": "1.33"
     },
     "systemNodeVmSize": {
       "value": "Standard_D2s_v5"
@@ -34,6 +34,15 @@
     },
     "wafState": {
       "value": "Enabled"
+    },
+    "serviceCidr": {
+      "value": "172.16.0.0/16"
+    },
+    "podCidr": {
+      "value": "192.168.0.0/16"
+    },
+    "maxPods": {
+      "value": 250
     }
   }
 }
