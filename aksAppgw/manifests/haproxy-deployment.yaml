@@ -1,0 +1,124 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: haproxy-ingress
+  namespace: haproxy-controller
+  labels:
+    app: haproxy-ingress
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: haproxy-ingress
+  template:
+    metadata:
+      labels:
+        app: haproxy-ingress
+    spec:
+      serviceAccountName: haproxy-ingress-serviceaccount
+      containers:
+      - name: haproxy-ingress
+        image: haproxytech/kubernetes-ingress:1.10
+        args:
+          - --default-backend-service=haproxy-controller/haproxy-ingress
+          - --ingress-class=haproxy
+          - --publish-service=haproxy-controller/haproxy-ingress
+        ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+        - name: https
+          containerPort: 443
+          protocol: TCP
+        - name: stat
+          containerPort: 1024
+          protocol: TCP
+        env:
+        - name: TZ
+          value: "Etc/UTC"
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        resources:
+          requests:
+            cpu: 250m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 1024
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 1024
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        securityContext:
+          runAsNonRoot: false
+          allowPrivilegeEscalation: true
+          capabilities:
+            add:
+              - NET_BIND_SERVICE
+        volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+        - name: run
+          mountPath: /run
+        - name: var-cache
+          mountPath: /var/cache
+        - name: var-lib
+          mountPath: /var/lib
+      volumes:
+      - name: tmp
+        emptyDir: {}
+      - name: run
+        emptyDir: {}
+      - name: var-cache
+        emptyDir: {}
+      - name: var-lib
+        emptyDir: {}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - haproxy-ingress
+              topologyKey: kubernetes.io/hostname
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: haproxy-ingress
+  namespace: haproxy-controller
+  labels:
+    app: haproxy-ingress
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+spec:
+  type: LoadBalancer
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  - name: https
+    port: 443
+    protocol: TCP
+    targetPort: 443
+  selector:
+    app: haproxy-ingress

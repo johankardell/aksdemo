@@ -1,0 +1,267 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: sample-app
+  labels:
+    name: sample-app
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sample-web-app
+  namespace: sample-app
+  labels:
+    app: sample-web-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: sample-web-app
+  template:
+    metadata:
+      labels:
+        app: sample-web-app
+    spec:
+      containers:
+      - name: web
+        image: nginx:1.25-alpine
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: 100m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 128Mi
+        volumeMounts:
+        - name: web-content
+          mountPath: /usr/share/nginx/html
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        securityContext:
+          runAsUser: 0
+          runAsGroup: 0
+          runAsNonRoot: false
+          readOnlyRootFilesystem: false
+          allowPrivilegeEscalation: false
+      volumes:
+      - name: web-content
+        configMap:
+          name: web-content
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sample-web-app-service
+  namespace: sample-app
+  labels:
+    app: sample-web-app
+spec:
+  selector:
+    app: sample-web-app
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+  type: ClusterIP
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: web-content
+  namespace: sample-app
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>AKS with HAProxy Ingress - Sample Application</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .container {
+                text-align: center;
+                background: rgba(255, 255, 255, 0.1);
+                padding: 3rem;
+                border-radius: 20px;
+                backdrop-filter: blur(10px);
+                box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+                border: 1px solid rgba(255, 255, 255, 0.18);
+                max-width: 800px;
+                margin: 2rem;
+            }
+            h1 {
+                font-size: 3rem;
+                margin-bottom: 1.5rem;
+                text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+                background: linear-gradient(45deg, #FFD700, #FFA500);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+            .subtitle {
+                font-size: 1.3rem;
+                margin-bottom: 2rem;
+                opacity: 0.9;
+            }
+            .architecture {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 1rem;
+                flex-wrap: wrap;
+                margin: 2rem 0;
+                font-size: 1.1rem;
+            }
+            .arrow {
+                font-size: 1.5rem;
+                color: #FFD700;
+            }
+            .component {
+                background: rgba(255, 255, 255, 0.2);
+                padding: 1rem 1.5rem;
+                border-radius: 10px;
+                border: 2px solid rgba(255, 255, 255, 0.3);
+                transition: transform 0.3s ease;
+            }
+            .component:hover {
+                transform: translateY(-5px);
+            }
+            .tech-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 1rem;
+                margin: 2rem 0;
+            }
+            .tech-card {
+                background: rgba(255, 255, 255, 0.15);
+                padding: 1.5rem;
+                border-radius: 15px;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                transition: all 0.3s ease;
+            }
+            .tech-card:hover {
+                transform: scale(1.05);
+                background: rgba(255, 255, 255, 0.25);
+            }
+            .tech-icon {
+                font-size: 2rem;
+                margin-bottom: 0.5rem;
+            }
+            .status {
+                background: rgba(34, 197, 94, 0.2);
+                border: 2px solid rgba(34, 197, 94, 0.5);
+                padding: 1rem;
+                border-radius: 10px;
+                margin: 2rem 0;
+            }
+            .info {
+                background: rgba(0, 0, 0, 0.2);
+                padding: 1rem;
+                border-radius: 10px;
+                margin-top: 2rem;
+                font-family: 'Courier New', monospace;
+                font-size: 0.9rem;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+            @media (max-width: 768px) {
+                h1 { font-size: 2rem; }
+                .architecture { flex-direction: column; }
+                .component { margin: 0.5rem 0; }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>🚀 AKS + HAProxy</h1>
+            <div class="subtitle">Sample Application Successfully Deployed</div>
+            
+            <div class="status">
+                <strong>✅ Status: Online</strong><br>
+                Your application is running through HAProxy Ingress Controller
+            </div>
+            
+            <div class="architecture">
+                <div class="component">🌐 Internet</div>
+                <div class="arrow">→</div>
+                <div class="component">🛡️ App Gateway</div>
+                <div class="arrow">→</div>
+                <div class="component">⚖️ HAProxy</div>
+                <div class="arrow">→</div>
+                <div class="component">📱 Web App</div>
+            </div>
+            
+            <div class="tech-grid">
+                <div class="tech-card">
+                    <div class="tech-icon">☸️</div>
+                    <strong>Azure Kubernetes Service</strong><br>
+                    Container Orchestration
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">⚖️</div>
+                    <strong>HAProxy Ingress</strong><br>
+                    Load Balancer & Router
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">🛡️</div>
+                    <strong>Application Gateway</strong><br>
+                    WAF & SSL Termination
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">🔧</div>
+                    <strong>Infrastructure as Code</strong><br>
+                    Azure Bicep Templates
+                </div>
+            </div>
+            
+            <div class="info">
+                <strong>Deployment Information:</strong><br>
+                Pod: <span id="hostname">Loading...</span><br>
+                Timestamp: <span id="timestamp"></span><br>
+                Load Balancer: HAProxy Ingress Controller<br>
+                Replicas: 3 pods with round-robin distribution
+            </div>
+        </div>
+        
+        <script>
+            // Display hostname and timestamp
+            document.getElementById('hostname').textContent = window.location.hostname || 'pod-' + Math.random().toString(36).substr(2, 9);
+            document.getElementById('timestamp').textContent = new Date().toLocaleString();
+            
+            // Add some interactivity
+            document.querySelectorAll('.tech-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    card.style.background = 'rgba(255, 255, 255, 0.3)';
+                    setTimeout(() => {
+                        card.style.background = 'rgba(255, 255, 255, 0.15)';
+                    }, 200);
+                });
+            });
+        </script>
+    </body>
+    </html>

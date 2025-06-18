@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: haproxy-configmap
+  namespace: haproxy-controller
+data:
+  # Global HAProxy configuration
+  global-config-snippet: |
+    log stdout local0
+    stats socket /tmp/haproxy-stats level admin
+    stats timeout 2m
+  
+  # Frontend configuration
+  frontend-config-snippet: |
+    bind *:80
+    option httplog
+    option forwardfor
+  
+  # Backend configuration  
+  backend-config-snippet: |
+    option httpchk GET /
+    http-check expect status 200
+  
+  # Timeouts
+  timeout-connect: "5s"
+  timeout-client: "50s"
+  timeout-server: "50s"
+  timeout-tunnel: "1h"
+  timeout-http-request: "5s"
+  timeout-keep-alive: "1m"
+  
+  # Load balancing
+  balance-algorithm: "roundrobin"
+  
+  # Health check interval
+  server-check-interval: "10s"

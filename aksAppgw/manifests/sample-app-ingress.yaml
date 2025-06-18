@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sample-app-ingress
+  namespace: sample-app
+  annotations:
+    # HAProxy Ingress Controller specific annotations
+    haproxy.org/load-balance: "roundrobin"
+    haproxy.org/check: "true"
+    haproxy.org/forwarded-for: "true"
+    haproxy.org/timeout-client: "50s"
+    haproxy.org/timeout-server: "50s"
+    haproxy.org/check-interval: "10s"
+    # Optional: Rate limiting
+    haproxy.org/rate-limit-requests: "100"
+    haproxy.org/rate-limit-period: "1m"
+spec:
+  ingressClassName: haproxy
+  rules:
+  - http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: sample-web-app-service
+            port:
+              number: 80

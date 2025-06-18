@@ -36,7 +36,7 @@ if [[ -z "$RESOURCE_GROUP_NAME" ]]; then
     exit 1
 fi
 
-print_header "Configuring Application Gateway Backend"
+print_header "Configuring Application Gateway Backend for HAProxy Ingress"
 
 # Check if Azure CLI is installed and logged in
 if ! command -v az &> /dev/null; then
@@ -70,34 +70,34 @@ if [[ -z "$APP_GATEWAY_NAME" ]]; then
     print_status "Found Application Gateway: $APP_GATEWAY_NAME"
 fi
 
-# Check if NGINX service exists
-print_status "Checking NGINX service in Kubernetes..."
-if ! kubectl get service nginx-service &> /dev/null; then
-    print_error "NGINX service 'nginx-service' not found. Please deploy NGINX first:"
-    print_error "kubectl apply -f manifests/nginx-deployment.yaml"
+# Check if HAProxy ingress service exists
+print_status "Checking HAProxy ingress service in Kubernetes..."
+if ! kubectl get service haproxy-ingress -n haproxy-controller &> /dev/null; then
+    print_error "HAProxy ingress service 'haproxy-ingress' not found. Please deploy HAProxy first:"
+    print_error "kubectl apply -f manifests/"
     exit 1
 fi
 
-# Get NGINX LoadBalancer IP
-print_status "Getting NGINX LoadBalancer IP..."
-NGINX_LB_IP=""
+# Get HAProxy LoadBalancer IP
+print_status "Getting HAProxy LoadBalancer IP..."
+HAPROXY_LB_IP=""
 for i in {1..12}; do
-    NGINX_LB_IP=$(kubectl get service nginx-service -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || echo "")
-    if [[ -n "$NGINX_LB_IP" && "$NGINX_LB_IP" != "<none>" ]]; then
+    HAPROXY_LB_IP=$(kubectl get service haproxy-ingress -n haproxy-controller -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || echo "")
+    if [[ -n "$HAPROXY_LB_IP" && "$HAPROXY_LB_IP" != "<none>" ]]; then
         break
     fi
     print_status "Waiting for LoadBalancer IP assignment... (attempt $i/12)"
     sleep 10
 done
 
-if [[ -z "$NGINX_LB_IP" || "$NGINX_LB_IP" == "<none>" ]]; then
+if [[ -z "$HAPROXY_LB_IP" || "$HAPROXY_LB_IP" == "<none>" ]]; then
     print_error "LoadBalancer IP is not assigned yet. This may take a few minutes."
     print_error "Try running this script again in a few minutes, or check with:"
-    print_error "kubectl get service nginx-service"
+    print_error "kubectl get service haproxy-ingress -n haproxy-controller"
     exit 1
 fi
 
-print_status "NGINX LoadBalancer IP: $NGINX_LB_IP"
+print_status "HAProxy LoadBalancer IP: $HAPROXY_LB_IP"
 
 # Update Application Gateway backend pool
 print_status "Updating Application Gateway backend pool..."
@@ -105,7 +105,7 @@ az network application-gateway address-pool update \
   --resource-group "$RESOURCE_GROUP_NAME" \
   --gateway-name "$APP_GATEWAY_NAME" \
   --name "appGatewayBackendPool" \
-  --servers "$NGINX_LB_IP"
+  --servers "$HAPROXY_LB_IP"
 
 # Verify backend health
 print_status "Checking backend health (this may take a minute)..."
@@ -128,7 +128,7 @@ print_header "Configuration Complete"
 print_status "Application Gateway backend pool updated successfully!"
 echo ""
 echo "Application Gateway: $APP_GATEWAY_NAME"
-echo "Backend IP: $NGINX_LB_IP"
+echo "Backend IP: $HAPROXY_LB_IP"
 echo "Public IP: $APP_GW_PUBLIC_IP"
 echo "Backend Health: $HEALTH_STATUS"
 echo ""
