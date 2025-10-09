@@ -36,3 +36,4 @@ terraform.tfstate
 
 # Loki
 values.yaml
+pull-secret.txt

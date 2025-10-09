@@ -1,0 +1,21 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: testvm
+spec:
+  running: true
+  template:
+    spec:
+      domain:
+        devices:
+          disks:
+          - disk:
+              bus: virtio
+            name: containerdisk
+        resources:
+          requests:
+            memory: 512M
+      volumes:
+      - name: containerdisk
+        containerDisk:
+          image: kubevirt/cirros-container-disk-demo
