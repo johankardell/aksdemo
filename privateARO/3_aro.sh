@@ -6,6 +6,8 @@ az aro create \
   --worker-subnet $ARO_SUBNET_WORKER_NAME \
   --apiserver-visibility Private \
   --ingress-visibility Private \
+  --version 4.16.48 \
+  --pull-secret @pull-secret.txt \
   --outbound-type UserDefinedRouting \
   --master-vm-size Standard_D8as_v5 \
   --worker-vm-size Standard_D4as_v5

@@ -43,10 +43,10 @@ ACR_NAME=jkarothehardway
 STUDENT_NAME=johan
 DNS_NAME=jkarothehardway
 
-az provider register -n Microsoft.RedHatOpenShift --no-wait
-az provider register -n Microsoft.Compute --no-wait
-az provider register -n Microsoft.Network --no-wait
-az provider register -n Microsoft.Storage --no-wait
+az provider register -n Microsoft.RedHatOpenShift
+az provider register -n Microsoft.Compute
+az provider register -n Microsoft.Network
+az provider register -n Microsoft.Storage
 
 az group create --name $HUB_RG --location $LOCATION
 az group create --name $SPOKE_RG --location $LOCATION
