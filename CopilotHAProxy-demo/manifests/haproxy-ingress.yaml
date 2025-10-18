@@ -1,0 +1,156 @@
+# HAProxy Ingress Controller installation and configuration
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: haproxy-controller
+---
+# ClusterRole for HAProxy Ingress Controller
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: haproxy-ingress
+rules:
+- apiGroups: [""]
+  resources: ["configmaps", "endpoints", "nodes", "pods", "services", "namespaces", "events", "serviceaccounts"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["extensions", "networking.k8s.io"]
+  resources: ["ingresses", "ingressclasses"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["events"]
+  verbs: ["create", "patch"]
+- apiGroups: ["extensions", "networking.k8s.io"]
+  resources: ["ingresses/status"]
+  verbs: ["update"]
+- apiGroups: ["discovery.k8s.io"]
+  resources: ["endpointslices"]
+  verbs: ["get", "list", "watch"]
+---
+# ServiceAccount for HAProxy Ingress Controller
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: haproxy-ingress
+  namespace: haproxy-controller
+---
+# ClusterRoleBinding for HAProxy Ingress Controller
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: haproxy-ingress
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: haproxy-ingress
+subjects:
+- kind: ServiceAccount
+  name: haproxy-ingress
+  namespace: haproxy-controller
+---
+# IngressClass for HAProxy
+apiVersion: networking.k8s.io/v1
+kind: IngressClass
+metadata:
+  name: haproxy
+spec:
+  controller: haproxy.org/ingress-controller
+---
+# ConfigMap for HAProxy Ingress Controller
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: haproxy-ingress
+  namespace: haproxy-controller
+data:
+  frontend-config-snippet: |
+    capture request header Host len 32
+    capture request header User-Agent len 64
+  global-config-snippet: |
+    log stdout len 65536 local0 debug
+---
+# HAProxy Ingress Controller Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: haproxy-ingress
+  namespace: haproxy-controller
+  labels:
+    app: haproxy-ingress
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: haproxy-ingress
+  template:
+    metadata:
+      labels:
+        app: haproxy-ingress
+    spec:
+      serviceAccountName: haproxy-ingress
+      containers:
+      - name: haproxy-ingress
+        image: haproxytech/kubernetes-ingress:latest
+        args:
+        - --configmap=haproxy-controller/haproxy-ingress
+        - --ingress-class=haproxy
+        - --publish-service=haproxy-controller/haproxy-ingress
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+        ports:
+        - name: http
+          containerPort: 80
+        - name: https
+          containerPort: 443
+        - name: stat
+          containerPort: 1024
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 1024
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 1024
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        env:
+        - name: TZ
+          value: "Etc/UTC"
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+---
+# HAProxy Ingress Controller Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: haproxy-ingress
+  namespace: haproxy-controller
+  labels:
+    app: haproxy-ingress
+spec:
+  type: LoadBalancer
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+    protocol: TCP
+  - name: https
+    port: 443
+    targetPort: 443
+    protocol: TCP
+  selector:
+    app: haproxy-ingress

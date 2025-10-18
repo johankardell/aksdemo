@@ -1,0 +1,42 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "environmentName": {
+      "value": "dev"
+    },
+    "location": {
+      "value": "Sweden Central"
+    },
+    "kubernetesVersion": {
+      "value": "1.31"
+    },
+    "systemNodeVmSize": {
+      "value": "Standard_D2s_v5"
+    },
+    "userNodeVmSize": {
+      "value": "Standard_D2s_v5"
+    },
+    "systemNodeCount": {
+      "value": 1
+    },
+    "userNodeCount": {
+      "value": 2
+    },
+    "adminUsername": {
+      "value": "azureuser"
+    },
+    "sshPublicKey": {
+      "value": ""
+    },
+    "serviceCidr": {
+      "value": "172.16.0.0/16"
+    },
+    "podCidr": {
+      "value": "192.168.0.0/16"
+    },
+    "maxPods": {
+      "value": 250
+    }
+  }
+}

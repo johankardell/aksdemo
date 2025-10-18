@@ -1,0 +1,142 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  namespace: default
+  labels:
+    app: nginx
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        volumeMounts:
+        - name: nginx-config
+          mountPath: /usr/share/nginx/html/index.html
+          subPath: index.html
+      volumes:
+      - name: nginx-config
+        configMap:
+          name: nginx-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+  namespace: default
+  labels:
+    app: nginx
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 80
+    protocol: TCP
+  selector:
+    app: nginx
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+  namespace: default
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Welcome to NGINX on AKS with HAProxy</title>
+        <style>
+            body {
+                width: 35em;
+                margin: 0 auto;
+                font-family: Tahoma, Verdana, Arial, sans-serif;
+                background-color: #f0f0f0;
+                padding: 20px;
+            }
+            .container {
+                background-color: white;
+                padding: 20px;
+                border-radius: 10px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            }
+            h1 {
+                color: #2c3e50;
+            }
+            .info {
+                background-color: #e8f4fd;
+                padding: 15px;
+                border-radius: 5px;
+                margin: 20px 0;
+            }
+            .highlight {
+                background-color: #fff3cd;
+                padding: 15px;
+                border-radius: 5px;
+                margin: 20px 0;
+                border-left: 4px solid #ffc107;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Welcome to NGINX on Azure Kubernetes Service (AKS)!</h1>
+            <p>If you can see this page, the NGINX web server is successfully installed and working through HAProxy Ingress Controller.</p>
+            
+            <div class="highlight">
+                <strong>🎉 This is the CopilotHAProxy-demo sample!</strong>
+                <p>This deployment showcases AKS with VNet injection, workload profile enabled, and HAProxy as ingress controller.</p>
+            </div>
+            
+            <div class="info">
+                <strong>Architecture:</strong>
+                <ul>
+                    <li>HAProxy Ingress Controller (Internet-facing)</li>
+                    <li>Azure Kubernetes Service (AKS) with VNet injection</li>
+                    <li>NGINX Deployment with 3 replicas (Backend)</li>
+                    <li>Workload Profile enabled with KEDA auto-scaler</li>
+                </ul>
+            </div>
+            
+            <p>This deployment demonstrates:</p>
+            <ul>
+                <li>Bicep infrastructure as code</li>
+                <li>AKS with VNet injection and workload profile</li>
+                <li>HAProxy Ingress Controller for external traffic</li>
+                <li>Load balancing across multiple NGINX pods</li>
+                <li>Workload identity and auto-scaling capabilities</li>
+            </ul>
+            
+            <p><em>Thank you for using Azure and Copilot!</em></p>
+        </div>
+    </body>
+    </html>
