@@ -6,7 +6,7 @@ param location string = resourceGroup().location
 @maxValue(1023)
 param osDiskSizeGB int = 0
 
-param agentCount int = 3
+param agentCount int = 1
 
 param sysVMSize string = 'Standard_B2ms'
 param appsVMSize string = 'Standard_B4ms'
@@ -70,6 +70,7 @@ resource aks 'Microsoft.ContainerService/managedClusters@2024-09-01' = {
     agentPoolProfiles: [
       {
         name: 'system'
+        type: 'VirtualMachineScaleSets'
         osDiskSizeGB: osDiskSizeGB
         count: agentCount
         vmSize: sysVMSize
@@ -80,16 +81,21 @@ resource aks 'Microsoft.ContainerService/managedClusters@2024-09-01' = {
         orchestratorVersion: nodeVersion
         minCount: 1
         maxCount: 5
+        nodeTaints: [
+          'CriticalAddonsOnly=true:NoSchedule'
+        ]
       }
       {
         name: 'apps'
+        type: 'VirtualMachineScaleSets'
         osDiskSizeGB: osDiskSizeGB
-        count: agentCount
+        count: 0
         vmSize: appsVMSize
         osType: 'Linux'
         osSKU: 'AzureLinux'
         mode: 'User'
         enableAutoScaling: true
+        nodeProvisioningMode: 'Auto'
         orchestratorVersion: nodeVersion
         minCount: 0
         maxCount: 10
