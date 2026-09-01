@@ -8,8 +8,7 @@ param osDiskSizeGB int = 0
 
 param agentCount int = 1
 
-param sysVMSize string = 'Standard_B2ms'
-param appsVMSize string = 'Standard_B4ms'
+param sysVMSize string = 'Standard_B2s_v2'
 
 @description('User name for the Linux Virtual Machines.')
 param linuxAdminUsername string
@@ -22,16 +21,18 @@ param logAnalyticsWorkspaceId string
 
 param aksidname string
 param managementIP string
+param clusterAdminPrincipalId string
 
-var k8sVersion = '1.31.1'
-var nodeVersion = '1.31.1'
+var k8sVersion = '1.36'
+var aksRbacClusterAdminRoleDefinitionId = 'b1ff04bb-8a4e-4dc4-8eb5-8693973ce19b'
+var aksClusterUserRoleDefinitionId = '4abbcc35-e782-43d8-92c5-2d3f1bd2253f'
 
 resource aksid 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: aksidname
   location: location
 }
 
-resource aks 'Microsoft.ContainerService/managedClusters@2024-09-01' = {
+resource aks 'Microsoft.ContainerService/managedClusters@2026-04-01' = {
   name: clusterName
   location: location
   identity: {
@@ -54,6 +55,9 @@ resource aks 'Microsoft.ContainerService/managedClusters@2024-09-01' = {
       podCidr: '192.168.0.0/16'
       networkDataplane: 'cilium'
     }
+    nodeProvisioningProfile: {
+      mode: 'Auto'
+    }
     disableLocalAccounts: true
     apiServerAccessProfile: {
       authorizedIPRanges: [
@@ -75,30 +79,12 @@ resource aks 'Microsoft.ContainerService/managedClusters@2024-09-01' = {
         count: agentCount
         vmSize: sysVMSize
         osType: 'Linux'
-        osSKU: 'AzureLinux'
+        osSKU: 'AzureLinux3'
         mode: 'System'
-        enableAutoScaling: true
-        orchestratorVersion: nodeVersion
-        minCount: 1
-        maxCount: 5
+        enableAutoScaling: false
         nodeTaints: [
           'CriticalAddonsOnly=true:NoSchedule'
         ]
-      }
-      {
-        name: 'apps'
-        type: 'VirtualMachineScaleSets'
-        osDiskSizeGB: osDiskSizeGB
-        count: 0
-        vmSize: appsVMSize
-        osType: 'Linux'
-        osSKU: 'AzureLinux'
-        mode: 'User'
-        enableAutoScaling: true
-        nodeProvisioningMode: 'Auto'
-        orchestratorVersion: nodeVersion
-        minCount: 0
-        maxCount: 10
       }
     ]
     linuxProfile: {
@@ -146,6 +132,26 @@ resource aks 'Microsoft.ContainerService/managedClusters@2024-09-01' = {
         }
       }
     }
+  }
+}
+
+resource clusterAdminRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(aks.id, clusterAdminPrincipalId, aksRbacClusterAdminRoleDefinitionId)
+  scope: aks
+  properties: {
+    principalId: clusterAdminPrincipalId
+    principalType: 'User'
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', aksRbacClusterAdminRoleDefinitionId)
+  }
+}
+
+resource clusterUserRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(aks.id, clusterAdminPrincipalId, aksClusterUserRoleDefinitionId)
+  scope: aks
+  properties: {
+    principalId: clusterAdminPrincipalId
+    principalType: 'User'
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', aksClusterUserRoleDefinitionId)
   }
 }
 

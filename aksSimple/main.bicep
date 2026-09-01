@@ -4,12 +4,13 @@ var rgName = 'rg-aks-simple-demo'
 param location string = deployment().location
 var laName = 'la-simple-demo'
 var aksName = 'aks-simple-demo'
-var acrName = 'jkacrsimpledemo'
+var acrName = 'jkacrsimple${uniqueString(subscription().id)}'
 var aksidname = 'id-aks'
 
 param sshkey string
 param managementIP string
 param deployACR bool
+param clusterAdminPrincipalId string
 
 resource rg 'Microsoft.Resources/resourceGroups@2024-07-01' = {
   name: rgName
@@ -37,6 +38,7 @@ module aks 'aks.bicep' = {
     logAnalyticsWorkspaceId: la.outputs.id
     aksidname: aksidname
     managementIP: managementIP
+    clusterAdminPrincipalId: clusterAdminPrincipalId
   }
 }
 
